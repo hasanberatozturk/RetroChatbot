@@ -77,6 +77,7 @@ function createChat({ era, formEl, inputEl, ui }) {
   const history = [];
 
   async function send(text) {
+    ui.onSend?.();
     ui.addUser(text);
     ui.setBusy(true);
     const loadingEl = ui.showLoading();
@@ -134,6 +135,7 @@ function createChat({ era, formEl, inputEl, ui }) {
         return;
       }
       history.push({ role: "user", text }, { role: "model", text: reply });
+      ui.onReply?.(reply);
     } catch {
       removeLoading();
       await finishTyping();
@@ -284,6 +286,8 @@ const futureChat = createChat({
     scroll: () => (futureMessagesEl.scrollTop = futureMessagesEl.scrollHeight),
     typing: { minChars: 2, maxChars: 4, tickMs: 16 },
     onReceiving: () => setFutureStatus("Yazıyor..."),
+    onSend: stopSpeaking,
+    onReply: speak,
     showLoading() {
       const bubble = addBubble("", "bot f-typing");
       bubble.setAttribute("aria-label", "Nova yazıyor");
@@ -297,6 +301,7 @@ const futureChat = createChat({
     setBusy(busy) {
       futureInputEl.disabled = busy;
       futureSendButton.disabled = busy;
+      document.getElementById("future-mic").disabled = busy;
       orbEl.classList.toggle("thinking", busy);
       setFutureStatus(busy ? "Düşünüyor..." : "Çevrimiçi");
       if (!busy) futureInputEl.focus();
@@ -309,6 +314,114 @@ futureSuggestionsEl.querySelectorAll(".f-chip").forEach((chip) => {
     if (!futureInputEl.disabled) futureChat.send(chip.textContent);
   });
 });
+
+/* ===================== 2030: sesli sohbet ===================== */
+
+const futureFormEl = document.getElementById("future-form");
+const micButton = document.getElementById("future-mic");
+const speakButton = document.getElementById("future-speak");
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+const canSpeak = "speechSynthesis" in window;
+let speakEnabled = false;
+let recognition = null;
+
+function loadPreference(key) {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function savePreference(key, value) {
+  try {
+    localStorage.setItem(key, value);
+  } catch {
+    // Tarayıcı depolamayı engelliyorsa tercih sadece bu oturumda geçerli olur
+  }
+}
+
+function speak(text) {
+  if (!speakEnabled || !canSpeak) return;
+  speechSynthesis.cancel();
+  // Emojileri okumasın ("parıltı" vb. demesin)
+  const utterance = new SpeechSynthesisUtterance(text.replace(/\p{Extended_Pictographic}/gu, ""));
+  utterance.lang = "tr-TR";
+  const voice = speechSynthesis.getVoices().find((v) => v.lang.toLowerCase().startsWith("tr"));
+  if (voice) utterance.voice = voice;
+  utterance.rate = 1.05;
+  speechSynthesis.speak(utterance);
+}
+
+function stopSpeaking() {
+  if (canSpeak) speechSynthesis.cancel();
+}
+
+function setSpeakEnabled(enabled) {
+  speakEnabled = enabled;
+  speakButton.setAttribute("aria-pressed", String(enabled));
+  speakButton.title = enabled ? "Sesli yanıt açık" : "Sesli yanıt kapalı";
+  if (!enabled) stopSpeaking();
+}
+
+if (canSpeak) {
+  setSpeakEnabled(loadPreference("nova-speak") === "1");
+  speakButton.addEventListener("click", () => {
+    setSpeakEnabled(!speakEnabled);
+    savePreference("nova-speak", speakEnabled ? "1" : "0");
+  });
+} else {
+  speakButton.hidden = true;
+}
+
+function stopListening() {
+  if (recognition) recognition.stop();
+}
+
+// Konuşma tanıma (Chrome/Edge). Desteklenmiyorsa mikrofon butonu gizli kalır.
+if (SpeechRecognition) {
+  micButton.hidden = false;
+  micButton.addEventListener("click", () => {
+    if (recognition) {
+      recognition.stop();
+      return;
+    }
+    if (futureInputEl.disabled) return;
+
+    stopSpeaking();
+    recognition = new SpeechRecognition();
+    recognition.lang = "tr-TR";
+    recognition.interimResults = true;
+    let heard = false;
+    let failed = false;
+
+    recognition.onresult = (event) => {
+      heard = true;
+      futureInputEl.value = Array.from(event.results, (r) => r[0].transcript).join("");
+    };
+    recognition.onerror = (event) => {
+      failed = true;
+      if (event.error === "not-allowed" || event.error === "service-not-allowed") {
+        addBubble("Mikrofon izni verilmedi. Tarayıcının adres çubuğundan izin verebilirsin.", "error");
+      } else if (event.error !== "no-speech" && event.error !== "aborted") {
+        addBubble(`Ses tanıma hatası: ${event.error}`, "error");
+      }
+    };
+    recognition.onend = () => {
+      recognition = null;
+      micButton.classList.remove("listening");
+      micButton.setAttribute("aria-label", "Sesle sor");
+      if (!futureInputEl.disabled) setFutureStatus("Çevrimiçi");
+      // Konuşma bittiyse mesajı otomatik gönder
+      if (heard && !failed && futureInputEl.value.trim()) futureFormEl.requestSubmit();
+    };
+
+    recognition.start();
+    micButton.classList.add("listening");
+    micButton.setAttribute("aria-label", "Dinlemeyi durdur");
+    setFutureStatus("Dinliyor...");
+  });
+}
 
 /* ===================== Saatler ===================== */
 
@@ -332,6 +445,8 @@ let switching = false;
 
 function applyMode(mode) {
   const isFuture = mode === "future";
+  stopSpeaking();
+  stopListening();
   retroSite.hidden = isFuture;
   futureSite.hidden = !isFuture;
   document.body.className = mode;

@@ -139,6 +139,34 @@ body.future {
   border-color: rgba(255, 255, 255, 0.2);
 }
 
+.f-icon-btn {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  color: var(--f-muted);
+  background: var(--f-glass-strong);
+  border: 1px solid var(--f-border);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s;
+}
+
+.f-icon-btn:hover {
+  color: var(--f-text);
+}
+
+.f-icon-btn[aria-pressed="true"] {
+  color: #ffffff;
+  background: var(--f-accent);
+  border-color: transparent;
+}
+
+.f-icon-btn[aria-pressed="true"] .f-speak-off,
+.f-icon-btn[aria-pressed="false"] .f-speak-waves {
+  display: none;
+}
+
 /* ---------- Sohbet kartı ---------- */
 
 .f-chat {
@@ -320,6 +348,28 @@ body.future {
 
 .f-input button:hover:not(:disabled) {
   transform: scale(1.06);
+}
+
+/* Mikrofon butonu: gönder butonundan farklı, sade */
+.f-input .f-mic {
+  color: var(--f-muted);
+  background: transparent;
+}
+
+.f-input .f-mic:hover:not(:disabled) {
+  color: var(--f-text);
+  background: var(--f-glass-strong);
+}
+
+.f-input .f-mic.listening {
+  color: #ffffff;
+  background: #ef4444;
+  animation: listening 1.4s ease-out infinite;
+}
+
+@keyframes listening {
+  0%   { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.55); }
+  100% { box-shadow: 0 0 0 14px rgba(239, 68, 68, 0); }
 }
 
 .f-input button:disabled,
