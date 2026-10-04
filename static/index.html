@@ -4,14 +4,46 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>RetroBot'un Sohbet Odası</title>
-  <link rel="stylesheet" href="/static/style.css">
-  <link rel="stylesheet" href="/static/future.css">
+  <link rel="stylesheet" href="/static/css/base.css">
+  <link rel="stylesheet" href="/static/css/era-1975.css">
+  <link rel="stylesheet" href="/static/css/era-1998.css">
+  <link rel="stylesheet" href="/static/css/era-2005.css">
+  <link rel="stylesheet" href="/static/css/era-2030.css">
+  <link rel="stylesheet" href="/static/css/era-2077.css">
 </head>
-<body class="retro">
+<body class="era-1998">
 
-  <!-- ===================== 1998 ===================== -->
+  <!-- ===================== 1975: daktilo ===================== -->
+  <div id="seventies-site" hidden>
+    <div class="s-tm" data-time-machine></div>
+
+    <div class="s-paper">
+      <header class="s-letterhead">
+        <div class="s-shop">KEMAL'İN PLAK DÜKKÂNI</div>
+        <div class="s-address">İstiklal Cad. No: 75, Beyoğlu — Tel: 44 75 75</div>
+        <div class="s-date" id="seventies-date"></div>
+      </header>
+
+      <div class="s-messages" id="seventies-messages" aria-live="polite"></div>
+
+      <form class="s-input" id="seventies-form" autocomplete="off">
+        <label for="seventies-input" class="s-prompt">SİZ:</label>
+        <input type="text" id="seventies-input" maxlength="2000"
+               placeholder="Teleksinizi yazınız..." required>
+        <button type="submit" class="s-key" id="seventies-send">GÖNDER</button>
+      </form>
+
+      <footer class="s-actions">
+        <button type="button" class="s-key s-key-small" id="seventies-export">Kâğıdı çıkar (indir)</button>
+        <button type="button" class="s-key s-key-small" id="seventies-clear">Yeni kâğıt tak</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- ===================== 1998: 90'lar web sitesi ===================== -->
   <div id="retro-site">
     <div class="top-bar">
+      <div class="r-tm" data-time-machine></div>
       <button type="button" class="modernize-btn" id="modernize-btn">
         <span class="blink">★</span> MODERNLEŞTİR! <span class="blink">★</span>
         <br><small>(2030'a ışınlan)</small>
@@ -89,7 +121,55 @@
     </div>
   </div>
 
-  <!-- ===================== 2030 ===================== -->
+  <!-- ===================== 2005: anlık mesajlaşma ===================== -->
+  <div id="noughties-site" hidden>
+    <div class="n-desktop">
+      <div class="n-window" id="noughties-window">
+        <div class="n-titlebar">
+          <span class="n-title">
+            <span class="n-buddy-icon" aria-hidden="true"></span>
+            ~*~EcE~*~ ♥ ile Konuşma
+          </span>
+          <span class="n-winbtns">
+            <button type="button" tabindex="-1" aria-hidden="true">_</button><button type="button" tabindex="-1" aria-hidden="true">□</button><button type="button" class="n-close" id="noughties-clear" title="Sohbeti temizle" aria-label="Sohbeti temizle">×</button>
+          </span>
+        </div>
+
+        <div class="n-toolbar">
+          <button type="button" class="n-tool" id="noughties-export">💾 Konuşmayı Kaydet</button>
+          <button type="button" class="n-tool" id="noughties-nudge">📳 Titreşim Gönder</button>
+        </div>
+
+        <div class="n-body">
+          <div class="n-conv">
+            <div class="n-to">
+              Kime: <b>~*~EcE~*~ ♥ hayat bazen zor ♥</b>
+              <span class="n-psm">♫ Hadise - Stir Me Up</span>
+            </div>
+            <div class="n-messages" id="noughties-messages" aria-live="polite"></div>
+            <div class="n-status" id="noughties-status"></div>
+            <form class="n-compose" id="noughties-form" autocomplete="off">
+              <input type="text" id="noughties-input" maxlength="2000"
+                     placeholder="Bir mesaj yazın..." required>
+              <button type="submit" id="noughties-send">Gönder</button>
+            </form>
+          </div>
+          <aside class="n-avatars" aria-hidden="true">
+            <div class="n-avatar n-avatar-ece">E<span>♥</span></div>
+            <div class="n-avatar n-avatar-me">Sen</div>
+          </aside>
+        </div>
+      </div>
+    </div>
+
+    <div class="n-taskbar">
+      <span class="n-start">başlat</span>
+      <div class="n-tm" data-time-machine></div>
+      <span class="n-tray" id="noughties-clock"></span>
+    </div>
+  </div>
+
+  <!-- ===================== 2030: modern asistan ===================== -->
   <div id="future-site" hidden>
     <div class="f-aurora" aria-hidden="true"></div>
 
@@ -125,9 +205,10 @@
             <path class="f-speak-off" d="M22 9l-6 6M16 9l6 6"/>
           </svg>
         </button>
-        <button type="button" class="f-ghost-btn" id="retro-btn">↺ 1998'e dön</button>
       </div>
     </header>
+
+    <div class="f-tm" data-time-machine></div>
 
     <main class="f-chat">
       <div class="f-messages" id="future-messages" aria-live="polite"></div>
@@ -159,12 +240,43 @@
     </main>
   </div>
 
+  <!-- ===================== 2077: neon terminal ===================== -->
+  <div id="cyber-site" hidden>
+    <div class="c-scanlines" aria-hidden="true"></div>
+
+    <header class="c-header">
+      <div class="c-logo" data-text="NEO//İSTANBUL">NEO//İSTANBUL</div>
+      <div class="c-meta">
+        <span>KANAL 77</span>
+        <span id="cyber-clock"></span>
+        <span class="c-signal">SİNYAL ▮▮▮▮▯</span>
+      </div>
+    </header>
+
+    <nav class="c-tm" data-time-machine></nav>
+
+    <main class="c-terminal">
+      <div class="c-messages" id="cyber-messages" aria-live="polite"></div>
+      <form class="c-input" id="cyber-form" autocomplete="off">
+        <label for="cyber-input" class="c-prompt">sen@neo-ist:~$</label>
+        <input type="text" id="cyber-input" maxlength="2000"
+               placeholder="ZERO'ya bağlan..." required spellcheck="false">
+        <button type="submit" id="cyber-send">GÖNDER</button>
+      </form>
+    </main>
+
+    <footer class="c-footer">
+      <button type="button" class="c-action" id="cyber-export">[ VERİYİ İNDİR ]</button>
+      <button type="button" class="c-action" id="cyber-clear">[ BELLEĞİ SİL ]</button>
+    </footer>
+  </div>
+
   <!-- Zaman yolculuğu geçiş efekti -->
   <div class="warp" id="warp" hidden>
     <div class="warp-tunnel"></div>
     <div class="warp-text" id="warp-text"></div>
   </div>
 
-  <script src="/static/script.js"></script>
+  <script type="module" src="/static/js/main.js"></script>
 </body>
 </html>

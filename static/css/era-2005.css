@@ -1,0 +1,430 @@
+/* ============ 2005: Windows XP masaüstü ve anlık mesajlaşma penceresi ============ */
+
+body.era-2005 {
+  --n-border: #7f9db9;
+  --n-beige: #ece9d8;
+
+  min-height: 100vh;
+  color: #000000;
+  font-family: Tahoma, "Segoe UI", Verdana, sans-serif;
+  font-size: 13px;
+  /* Mavi gökyüzü ve yeşil tepe */
+  background:
+    radial-gradient(140% 60% at 30% 105%, #6dbb43 0 45%, #3f8f25 70%, transparent 71%),
+    radial-gradient(80% 30% at 70% 30%, rgba(255, 255, 255, 0.55), transparent 70%),
+    linear-gradient(180deg, #2f6fd6 0%, #6aa6ec 45%, #b8d8f6 70%);
+  background-attachment: fixed;
+}
+
+#noughties-site {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.n-desktop {
+  display: grid;
+  flex: 1;
+  place-items: center;
+  padding: 16px 16px 64px;
+}
+
+/* ---------- Pencere ---------- */
+
+.n-window {
+  width: min(740px, 100%);
+  background: var(--n-beige);
+  border: 3px solid #0054e3;
+  border-top: none;
+  border-radius: 8px 8px 0 0;
+  box-shadow: 3px 6px 18px rgba(0, 0, 0, 0.45);
+}
+
+.n-window.shake {
+  animation: n-shake 0.5s ease-in-out;
+}
+
+@keyframes n-shake {
+  0%, 100%      { transform: translate(0, 0); }
+  10%, 50%, 90% { transform: translate(-9px, 2px); }
+  30%, 70%      { transform: translate(9px, -2px); }
+}
+
+.n-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 5px 6px 5px 8px;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: bold;
+  text-shadow: 1px 1px #0f1089;
+  background: linear-gradient(180deg, #0997ff, #0053ee 8%, #0050ee 40%, #0066ff 88%, #005bff 95%, #003dd7);
+  border-radius: 7px 7px 0 0;
+}
+
+.n-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.n-buddy-icon {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #b9f5b9, #23a023);
+  box-shadow: 0 0 0 1px #0b5d0b;
+}
+
+.n-winbtns {
+  display: flex;
+  flex-shrink: 0;
+  gap: 2px;
+}
+
+.n-winbtns button {
+  width: 21px;
+  height: 21px;
+  padding: 0;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: bold;
+  line-height: 1;
+  background: linear-gradient(180deg, #3c8cfb, #2663de);
+  border: 1px solid #ffffff;
+  border-radius: 3px;
+  cursor: default;
+}
+
+.n-winbtns .n-close {
+  background: linear-gradient(180deg, #e5785b, #c2401f);
+  cursor: pointer;
+}
+
+.n-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px 6px;
+  background: linear-gradient(180deg, #fdfdfb, var(--n-beige));
+  border-bottom: 1px solid #c5c2b2;
+}
+
+.n-tool {
+  padding: 4px 8px;
+  font-family: inherit;
+  font-size: 12px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.n-tool:hover:not(:disabled) {
+  background: #ffffff;
+  border-color: #c5c2b2;
+}
+
+.n-tool:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* ---------- Konuşma alanı ---------- */
+
+.n-body {
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+}
+
+.n-conv {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.n-to {
+  padding: 4px 8px;
+  font-size: 12px;
+  background: #ffffff;
+  border: 1px solid var(--n-border);
+}
+
+.n-psm {
+  display: block;
+  color: #666666;
+  font-size: 11px;
+  font-style: italic;
+}
+
+.n-messages {
+  height: 340px;
+  padding: 8px;
+  overflow-y: auto;
+  background: #ffffff;
+  border: 1px solid var(--n-border);
+}
+
+.n-msg {
+  margin-bottom: 8px;
+}
+
+.n-says {
+  color: #666666;
+  font-size: 12px;
+}
+
+.n-text {
+  padding-left: 12px;
+  font-size: 14px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* 2005'te herkesin kendi yazı tipi ve rengi vardı */
+.n-from-user .n-text {
+  color: #000080;
+  font-family: "Comic Sans MS", "Comic Sans", cursive;
+}
+
+.n-from-buddy .n-text {
+  color: #c71585;
+  font-family: "Trebuchet MS", Verdana, sans-serif;
+}
+
+.n-msg.streaming .n-text::after {
+  content: "|";
+  margin-left: 1px;
+  animation: n-blink 0.9s steps(1) infinite;
+}
+
+@keyframes n-blink {
+  50% { opacity: 0; }
+}
+
+.n-system {
+  margin-bottom: 8px;
+  color: #666666;
+  font-size: 12px;
+}
+
+.n-nudge {
+  color: #cc0000;
+  font-weight: bold;
+}
+
+.n-error {
+  color: #cc0000;
+}
+
+.n-status {
+  min-height: 16px;
+  color: #666666;
+  font-size: 11px;
+}
+
+.n-compose {
+  display: flex;
+  gap: 6px;
+}
+
+.n-compose input {
+  flex: 1;
+  min-width: 0;
+  height: 44px;
+  padding: 4px 8px;
+  font-family: inherit;
+  font-size: 13px;
+  background: #ffffff;
+  border: 1px solid var(--n-border);
+  outline: none;
+}
+
+.n-compose input:focus {
+  border-color: #3c7fb1;
+}
+
+.n-compose button {
+  padding: 0 18px;
+  font-family: inherit;
+  font-size: 13px;
+  background: linear-gradient(180deg, #ffffff, var(--n-beige) 85%, #d6d0c5);
+  border: 1px solid #003c74;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.n-compose button:hover:not(:disabled) {
+  box-shadow: inset 0 0 0 2px #f8b636;
+}
+
+.n-compose button:disabled,
+.n-compose input:disabled {
+  color: #a0a0a0;
+  cursor: default;
+}
+
+/* Görüntü resimleri */
+.n-avatars {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100px;
+}
+
+.n-avatar {
+  display: grid;
+  place-items: center;
+  width: 96px;
+  height: 96px;
+  color: #ffffff;
+  font-size: 42px;
+  font-weight: bold;
+  text-shadow: 1px 2px 3px rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--n-border);
+  border-radius: 4px;
+}
+
+.n-avatar-ece {
+  position: relative;
+  background: linear-gradient(135deg, #ff7eb9, #9b5de5);
+}
+
+.n-avatar-ece span {
+  position: absolute;
+  right: 8px;
+  bottom: 4px;
+  font-size: 18px;
+}
+
+.n-avatar-me {
+  font-size: 22px;
+  background: linear-gradient(135deg, #5fd35f, #2f80ed);
+}
+
+/* ---------- Görev çubuğu ve zaman makinesi ---------- */
+
+.n-taskbar {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  background: linear-gradient(180deg, #1f6fe5, #3d8af7 8%, #245edb 40%, #1941a5);
+}
+
+.n-start {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  height: 100%;
+  padding: 0 18px 0 14px;
+  color: #ffffff;
+  font-family: "Franklin Gothic Medium", "Trebuchet MS", Tahoma, sans-serif;
+  font-size: 18px;
+  font-style: italic;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  background: linear-gradient(180deg, #4cb84c, #2f8a2f 50%, #2a7a2a);
+  border-radius: 0 12px 12px 0;
+}
+
+.n-tm {
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.n-tm .tm {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.n-tm .tm-label {
+  flex-shrink: 0;
+  margin-right: 4px;
+  color: #ffffff;
+  font-size: 11px;
+  opacity: 0.85;
+}
+
+.n-tm .tm-year {
+  flex-shrink: 0;
+  height: 28px;
+  padding: 0 12px;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 12px;
+  background: linear-gradient(180deg, #3c81f3, #2a64d8);
+  border: 1px solid #1941a5;
+  border-radius: 3px;
+  box-shadow: inset 1px 1px rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+}
+
+.n-tm .tm-year:hover:not(:disabled) {
+  background: linear-gradient(180deg, #5394f7, #3a74e6);
+}
+
+.n-tm .tm-year[aria-current="true"] {
+  background: linear-gradient(180deg, #1e52b7, #1941a5);
+  box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.5);
+  cursor: default;
+}
+
+.n-tray {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  height: 100%;
+  padding: 0 14px;
+  color: #ffffff;
+  font-size: 12px;
+  background: linear-gradient(180deg, #0f8ef5, #0b77d9);
+  border-left: 1px solid #0b4fb1;
+}
+
+@media (max-width: 600px) {
+  .n-desktop {
+    padding: 8px 8px 56px;
+  }
+
+  .n-avatars,
+  .n-tm .tm-label {
+    display: none;
+  }
+
+  .n-messages {
+    height: 50vh;
+  }
+
+  .n-start {
+    padding: 0 10px;
+    font-size: 15px;
+  }
+
+  .n-tm .tm-year {
+    padding: 0 8px;
+  }
+
+  .n-tray {
+    padding: 0 8px;
+  }
+}

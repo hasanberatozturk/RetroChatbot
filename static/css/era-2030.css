@@ -1,6 +1,6 @@
 /* ============ 2030 arayüzü ============ */
 
-body.future {
+body.era-2030 {
   --f-bg: #07070d;
   --f-text: #ecebf5;
   --f-muted: #9a98b3;
@@ -378,62 +378,57 @@ body.future {
   cursor: not-allowed;
 }
 
-/* ---------- Zaman yolculuğu geçişi ---------- */
+/* ---------- Zaman makinesi (segmentli seçici) ---------- */
 
-.warp {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  display: grid;
-  place-items: center;
-  overflow: hidden;
-  background: #000000;
-  animation: warp-fade 1.4s ease-in-out forwards;
+.f-tm .tm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin: 0 auto;
+  padding: 4px;
+  width: fit-content;
+  max-width: 100%;
+  background: var(--f-glass);
+  border: 1px solid var(--f-border);
+  border-radius: 999px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
-.warp-tunnel {
-  position: absolute;
-  inset: -50%;
-  background: repeating-conic-gradient(
-    from 0deg,
-    rgba(124, 92, 255, 0.9) 0deg 2deg,
-    transparent 2deg 9deg,
-    rgba(34, 211, 238, 0.8) 9deg 10deg,
-    transparent 10deg 18deg
-  );
-  -webkit-mask: radial-gradient(circle, transparent 8%, #000 60%);
-  mask: radial-gradient(circle, transparent 8%, #000 60%);
-  animation: warp-zoom 1.4s ease-in forwards;
+.f-tm .tm-label {
+  padding: 0 8px 0 10px;
+  color: var(--f-muted);
+  font-size: 12px;
 }
 
-.warp-text {
-  position: relative;
-  padding: 10px 20px;
+.f-tm .tm-year {
+  padding: 6px 12px;
+  color: var(--f-text);
+  font: inherit;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  background: transparent;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.f-tm .tm-year:hover:not([aria-current="true"]) {
+  background: var(--f-glass-strong);
+}
+
+.f-tm .tm-year[aria-current="true"] {
   color: #ffffff;
-  font-family: "Segoe UI", system-ui, sans-serif;
-  font-size: clamp(18px, 4vw, 28px);
-  font-weight: 600;
-  letter-spacing: 1px;
-  text-align: center;
-  text-shadow: 0 0 20px rgba(124, 92, 255, 0.9);
-}
-
-@keyframes warp-zoom {
-  from { transform: scale(0.6) rotate(0deg); opacity: 0.4; }
-  to   { transform: scale(2.4) rotate(40deg); opacity: 1; }
-}
-
-@keyframes warp-fade {
-  0%   { opacity: 0; }
-  15%  { opacity: 1; }
-  80%  { opacity: 1; }
-  100% { opacity: 0; }
+  background: var(--f-accent);
+  cursor: default;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .f-aurora,
-  .f-orb,
-  .warp-tunnel {
+  .f-orb {
     animation: none;
   }
 }
@@ -464,5 +459,13 @@ body.future {
 
   .f-input {
     margin: 0 10px 10px;
+  }
+
+  .f-tm .tm-label {
+    display: none;
+  }
+
+  .f-tm .tm-year {
+    padding: 6px 10px;
   }
 }

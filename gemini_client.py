@@ -64,7 +64,7 @@ def _retry_delay_seconds(error: errors.APIError) -> float:
 
 def _build_request(message: str, history: list[dict], era: str):
     """history: [{"role": "user" | "model", "text": "..."}] (en eskiden en yeniye)
-    era: PROMPTS içindeki dönem anahtarı (ör. "retro", "future")"""
+    era: PROMPTS içindeki dönem anahtarı (ör. "1998", "2030")"""
     contents = [
         types.Content(role=item["role"], parts=[types.Part(text=item["text"])])
         for item in history
@@ -104,7 +104,7 @@ async def _with_fallback(call: Callable[[str], Awaitable[T]]) -> T:
     raise AllModelsBusyError(min(waits) if waits else None)
 
 
-async def ask_gemini(message: str, history: list[dict], era: str = "retro") -> str:
+async def ask_gemini(message: str, history: list[dict], era: str = "1998") -> str:
     """Cevabın tamamını tek seferde döndürür."""
     contents, config = _build_request(message, history, era)
 
@@ -118,7 +118,7 @@ async def ask_gemini(message: str, history: list[dict], era: str = "retro") -> s
 
 
 async def stream_gemini(
-    message: str, history: list[dict], era: str = "retro"
+    message: str, history: list[dict], era: str = "1998"
 ) -> AsyncIterator[str]:
     """Cevabı parça parça veren bir async iterator döndürür.
 

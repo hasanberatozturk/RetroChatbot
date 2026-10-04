@@ -1,0 +1,261 @@
+/* ============ 1975: ahşap masa üzerinde daktilo kâğıdı ============ */
+
+body.era-1975 {
+  --s-ink: #1d1d1d;
+  --s-red-ink: #9b1c1c;
+  --s-paper: #fbf7ec;
+  --s-muted: #6b6457;
+
+  min-height: 100vh;
+  padding: 24px 16px;
+  color: var(--s-ink);
+  font-family: "Courier New", Courier, monospace;
+  /* Ahşap masa */
+  background-color: #5a3a1e;
+  background-image:
+    repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.05) 0 2px, transparent 2px 11px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.03) 0 1px, transparent 1px 37px),
+    linear-gradient(180deg, #6e4826, #4a2e17);
+}
+
+#seventies-site {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+/* ---------- Zaman makinesi: pirinç plaka üzerinde daktilo tuşları ---------- */
+
+.s-tm .tm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: linear-gradient(180deg, #e6cf8f, #b8963f);
+  border: 2px solid #7a5c1c;
+  border-radius: 6px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4), inset 0 1px rgba(255, 255, 255, 0.5);
+}
+
+.s-tm .tm-label {
+  color: #3b2a0a;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.s-tm .tm-year,
+.s-key {
+  color: #f3ecd9;
+  font-family: inherit;
+  font-weight: bold;
+  background: radial-gradient(circle at 50% 35%, #3a3a3a, #141414);
+  border: 3px solid #c9c2b4;
+  border-radius: 999px;
+  box-shadow: 0 3px 0 #000000, 0 4px 6px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  transition: transform 0.05s, box-shadow 0.05s;
+}
+
+.s-tm .tm-year {
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+.s-tm .tm-year[aria-current="true"] {
+  background: radial-gradient(circle at 50% 35%, #c33b3b, #7a1414);
+  cursor: default;
+}
+
+.s-tm .tm-year:active:not(:disabled),
+.s-key:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #000000;
+}
+
+/* ---------- Kâğıt ---------- */
+
+.s-paper {
+  position: relative;
+  padding: 32px 32px 24px 64px;
+  background-color: var(--s-paper);
+  /* Silik satır çizgileri */
+  background-image: repeating-linear-gradient(
+    180deg, transparent 0 27px, rgba(80, 110, 160, 0.12) 27px 28px
+  );
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+  transform: rotate(-0.4deg);
+}
+
+/* Soldaki kırmızı kenar çizgisi */
+.s-paper::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 44px;
+  width: 1px;
+  background: rgba(200, 60, 60, 0.45);
+}
+
+.s-letterhead {
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  text-align: center;
+  border-bottom: 3px double var(--s-ink);
+}
+
+.s-shop {
+  font-size: 22px;
+  font-weight: bold;
+  letter-spacing: 3px;
+}
+
+.s-address {
+  margin-top: 4px;
+  color: var(--s-muted);
+  font-size: 13px;
+}
+
+.s-date {
+  margin-top: 12px;
+  font-size: 14px;
+  text-align: right;
+}
+
+.s-messages {
+  min-height: 36vh;
+  max-height: 52vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #c9bfa6 transparent;
+}
+
+.s-line {
+  margin: 0 0 12px;
+  font-size: 15px;
+  line-height: 28px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  /* Mürekkebin kâğıda hafif yayılması */
+  text-shadow: 0 0 0.6px rgba(0, 0, 0, 0.55);
+}
+
+.s-who {
+  font-weight: bold;
+}
+
+.s-user {
+  color: var(--s-red-ink);
+}
+
+.s-note {
+  color: var(--s-muted);
+  font-style: italic;
+  text-align: center;
+}
+
+.s-wait {
+  animation: s-blink 1s steps(1) infinite;
+}
+
+.s-error {
+  color: var(--s-red-ink);
+  font-weight: bold;
+}
+
+.s-line.streaming::after {
+  content: "▌";
+  animation: s-blink 0.8s steps(1) infinite;
+}
+
+@keyframes s-blink {
+  50% { opacity: 0; }
+}
+
+/* ---------- Yazma satırı ---------- */
+
+.s-input {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px dashed #9a927f;
+}
+
+.s-prompt {
+  color: var(--s-red-ink);
+  font-weight: bold;
+}
+
+.s-input input {
+  flex: 1;
+  min-width: 0;
+  padding: 6px 2px;
+  color: var(--s-red-ink);
+  font-family: inherit;
+  font-size: 15px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #555555;
+  outline: none;
+}
+
+.s-input input::placeholder {
+  color: #a39b88;
+}
+
+.s-key {
+  padding: 8px 16px;
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+
+.s-key:disabled,
+.s-input input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.s-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.s-key-small {
+  padding: 6px 12px;
+  font-size: 11px;
+}
+
+@media (max-width: 600px) {
+  body.era-1975 {
+    padding: 16px 12px;
+  }
+
+  .s-paper {
+    padding: 20px 16px 16px 30px;
+    transform: none;
+  }
+
+  .s-paper::before {
+    left: 18px;
+  }
+
+  .s-shop {
+    font-size: 17px;
+    letter-spacing: 2px;
+  }
+
+  .s-key {
+    padding: 8px 12px;
+  }
+}

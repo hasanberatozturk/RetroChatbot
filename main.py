@@ -18,8 +18,11 @@ from prompts import PROMPTS  # noqa: E402
 STATIC_DIR = BASE_DIR / "static"
 MAX_HISTORY = 20  # Gemini'ye gönderilen en fazla geçmiş mesaj sayısı
 EMPTY_REPLIES = {
-    "retro": "Hmm, modem bağlantısı koptu galiba... Bir daha yazar mısın? :)",
-    "future": "Nöral bağlantıda kısa bir parazit oldu, tekrar sorar mısın?",
+    "1975": "Teleks kâğıdı sıkıştı galiba efendim, bir daha yazar mısınız?",
+    "1998": "Hmm, modem bağlantısı koptu galiba... Bir daha yazar mısın? :)",
+    "2005": "ayy bağlantı koptu sanırım, bi daha yazar mısın :S",
+    "2030": "Nöral bağlantıda kısa bir parazit oldu, tekrar sorar mısın?",
+    "2077": "Ağda parazit var // sinyali tekrar gönder.",
 }
 DEFAULT_EMPTY_REPLY = "Bağlantıda bir sorun oldu, tekrar dener misin?"
 
@@ -57,7 +60,7 @@ class HistoryItem(BaseModel):
 class ChatRequest(BaseModel):
     message: str = Field(min_length=1, max_length=2000)
     history: list[HistoryItem] = []
-    era: str = "retro"
+    era: str = "1998"
 
     @field_validator("era")
     @classmethod

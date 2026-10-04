@@ -1,0 +1,77 @@
+/* Tüm dönemlerin ortak stilleri */
+
+* {
+  box-sizing: border-box;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+body {
+  margin: 0;
+}
+
+/* Zaman makinesi: işaretleme main.js'de üretilir, görünümü her dönemin CSS'inde */
+.tm-years {
+  display: contents;
+}
+
+/* ---------- Zaman yolculuğu geçişi ---------- */
+
+.warp {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #000000;
+  animation: warp-fade 1.4s ease-in-out forwards;
+}
+
+.warp-tunnel {
+  position: absolute;
+  inset: -50%;
+  background: repeating-conic-gradient(
+    from 0deg,
+    rgba(124, 92, 255, 0.9) 0deg 2deg,
+    transparent 2deg 9deg,
+    rgba(34, 211, 238, 0.8) 9deg 10deg,
+    transparent 10deg 18deg
+  );
+  -webkit-mask: radial-gradient(circle, transparent 8%, #000 60%);
+  mask: radial-gradient(circle, transparent 8%, #000 60%);
+  animation: warp-zoom 1.4s ease-in forwards;
+}
+
+.warp-text {
+  position: relative;
+  padding: 10px 20px;
+  color: #ffffff;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  font-size: clamp(18px, 4vw, 28px);
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-align: center;
+  text-shadow: 0 0 20px rgba(124, 92, 255, 0.9);
+}
+
+@keyframes warp-zoom {
+  from { transform: scale(0.6) rotate(0deg); opacity: 0.4; }
+  to   { transform: scale(2.4) rotate(40deg); opacity: 1; }
+}
+
+@keyframes warp-fade {
+  0%   { opacity: 0; }
+  15%  { opacity: 1; }
+  80%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .warp-tunnel {
+    animation: none;
+  }
+}
+

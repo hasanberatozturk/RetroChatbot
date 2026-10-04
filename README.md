@@ -1,8 +1,18 @@
 # RetroChatbot
 
-Kendini farklı bir yılda sanan bir sohbet botu. Varsayılan olarak **1998**'de yaşayan
-**RetroBot** ile konuşursun; "Modernleştir" butonuna basınca **2030**'dan gelen **Nova**'ya
-geçersin. Her dönemin hem kişiliği hem de arayüzü o yıla göre tasarlandı.
+Kendini farklı bir yılda sanan bir sohbet botu. **Zaman makinesi** ile beş dönem arasında
+geçiş yaparsın; her dönemin hem kişiliği hem de arayüzü o yıla göre tasarlandı:
+
+| Yıl | Bot | Arayüz |
+|---|---|---|
+| 1975 | **Kemal**, Beyoğlu'nda plak dükkânında | Ahşap masada daktilo kâğıdı, teleks yazışması |
+| 1998 | **RetroBot**, internet kafede gece vardiyası | 90'lar kişisel web sitesi, Windows 95 sohbet penceresi |
+| 2005 | **Ece**, liseli | Windows XP masaüstü, anlık mesajlaşma, "titreşim gönder" |
+| 2030 | **Nova**, kişisel yapay zeka | Cam efektli modern arayüz, sesli sohbet |
+| 2077 | **ZERO**, Neo-İstanbul'da bilgi simsarı | Neon ışıklı siberpunk terminal |
+
+Cevaplar akışla gelir ve her dönemin hızında harf harf yazılır. Sohbetler tarayıcıda
+saklanır ve her dönemden dosya olarak indirilebilir.
 
 - **Backend:** Python, FastAPI
 - **Yapay zeka:** Google Gemini API (`google-genai`)
@@ -42,16 +52,25 @@ Google'ın bildirdiği bekleme süresi boyunca o model atlanır ve sıradaki mod
 ## Proje yapısı
 
 ```
-main.py            FastAPI uygulaması ve API endpoint'leri
-gemini_client.py   Gemini istekleri, yedek model zinciri ve kota takibi
-prompts.py         Her dönemin kişiliği (system prompt)
-static/            Arayüz: index.html, style.css (1998), future.css (2030), script.js
+main.py              FastAPI uygulaması ve API endpoint'leri
+gemini_client.py     Gemini istekleri (normal ve akışlı), yedek model zinciri, kota takibi
+prompts.py           Her dönemin kişiliği (system prompt), yıl anahtarıyla
+static/index.html    Beş dönemin sayfa iskeleti
+static/css/          base.css (ortak) + her dönemin kendi stili (era-1975.css ...)
+static/js/core.js    Ortak sohbet mantığı: akış okuma, yazma efekti, kayıt
+static/js/era-*.js   Her dönemin arayüzü
+static/js/main.js    Zaman makinesi ve başlangıç
 ```
+
+Yeni bir dönem eklemek için: `prompts.py`'a kişiliği, `index.html`'e bir bölüm,
+`static/css/era-YYYY.css` ve `static/js/era-YYYY.js` dosyalarını ekleyip modülü
+`main.js`'deki `ERAS` listesine koy.
 
 ## API
 
 | Endpoint | Açıklama |
 |---|---|
 | `GET /` | Arayüz |
-| `POST /api/chat` | `{ "message": "...", "history": [...], "era": "retro" \| "future" }` → `{ "reply": "..." }` |
+| `POST /api/chat` | `{ "message": "...", "history": [...], "era": "1998" }` → `{ "reply": "..." }` |
+| `POST /api/chat/stream` | Aynı istek; cevap NDJSON olarak parça parça gelir: `{"type": "chunk", "text": "..."}` ... `{"type": "done"}` |
 | `POST /api/visit` | Ziyaretçi sayacını bir artırır |

@@ -1,0 +1,330 @@
+/* ============ 2077: neon ışıklı siberpunk terminal ============ */
+
+body.era-2077 {
+  --c-cyan: #00f0ff;
+  --c-pink: #ff2bd6;
+  --c-yellow: #f5ff3b;
+  --c-text: #e0f7ff;
+  --c-dim: #7d8aa3;
+
+  min-height: 100vh;
+  color: var(--c-text);
+  font-family: Consolas, "Cascadia Mono", "Courier New", monospace;
+  background:
+    radial-gradient(60% 40% at 15% 0%, rgba(255, 43, 214, 0.18), transparent 70%),
+    radial-gradient(50% 40% at 90% 100%, rgba(0, 240, 255, 0.15), transparent 70%),
+    #05010a;
+}
+
+#cyber-site {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 980px;
+  height: 100vh;
+  height: 100dvh;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+/* CRT tarama çizgileri */
+.c-scanlines {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 3px
+  );
+  animation: c-flicker 6s infinite;
+}
+
+@keyframes c-flicker {
+  0%, 96%, 100% { opacity: 1; }
+  97%           { opacity: 0.6; }
+  98%           { opacity: 1; }
+  99%           { opacity: 0.75; }
+}
+
+/* ---------- Başlık ---------- */
+
+.c-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(0, 240, 255, 0.35);
+}
+
+.c-logo {
+  position: relative;
+  color: var(--c-cyan);
+  font-size: clamp(26px, 6vw, 44px);
+  font-weight: 800;
+  letter-spacing: 4px;
+  text-shadow: 0 0 8px var(--c-cyan), 0 0 24px rgba(0, 240, 255, 0.6);
+}
+
+/* Bozulma (glitch) efekti: yazının pembe ve sarı kopyaları ara sıra kayar */
+.c-logo::before,
+.c-logo::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+
+.c-logo::before {
+  color: var(--c-pink);
+  animation: c-glitch 4s infinite steps(1);
+}
+
+.c-logo::after {
+  color: var(--c-yellow);
+  animation: c-glitch 4s 0.15s infinite steps(1) reverse;
+}
+
+@keyframes c-glitch {
+  0%, 88%, 100% { opacity: 0; transform: none; clip-path: none; }
+  90% { opacity: 0.8; transform: translate(-3px, 1px); clip-path: inset(10% 0 55% 0); }
+  93% { opacity: 0.8; transform: translate(3px, -1px); clip-path: inset(60% 0 8% 0); }
+  96% { opacity: 0.8; transform: translate(-2px, 0); clip-path: inset(35% 0 35% 0); }
+}
+
+.c-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  color: var(--c-dim);
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+
+.c-signal {
+  color: var(--c-yellow);
+}
+
+/* ---------- Zaman makinesi ---------- */
+
+.c-tm .tm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.c-tm .tm-label {
+  margin-right: 4px;
+  color: var(--c-pink);
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.c-tm .tm-year {
+  padding: 5px 14px;
+  color: var(--c-cyan);
+  font-family: inherit;
+  font-size: 13px;
+  background: transparent;
+  border: 1px solid rgba(0, 240, 255, 0.5);
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  cursor: pointer;
+  transition: background 0.15s, box-shadow 0.15s;
+}
+
+.c-tm .tm-year:hover:not(:disabled) {
+  background: rgba(0, 240, 255, 0.14);
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.5);
+}
+
+.c-tm .tm-year[aria-current="true"] {
+  color: #05010a;
+  font-weight: bold;
+  background: var(--c-pink);
+  border-color: var(--c-pink);
+  cursor: default;
+}
+
+/* ---------- Terminal ---------- */
+
+.c-terminal {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  background: rgba(10, 0, 20, 0.78);
+  border: 1px solid rgba(255, 43, 214, 0.55);
+  box-shadow: 0 0 24px rgba(255, 43, 214, 0.25), inset 0 0 40px rgba(0, 240, 255, 0.06);
+  clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
+}
+
+.c-messages {
+  flex: 1;
+  min-height: 0;
+  padding: 18px;
+  overflow-y: auto;
+  font-size: 14.5px;
+  line-height: 1.6;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 43, 214, 0.5) transparent;
+}
+
+.c-line {
+  margin: 0 0 10px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.c-who {
+  font-weight: bold;
+}
+
+.c-user .c-who {
+  color: var(--c-cyan);
+}
+
+.c-bot {
+  color: #ffe6fb;
+}
+
+.c-bot .c-who {
+  color: var(--c-pink);
+  text-shadow: 0 0 6px rgba(255, 43, 214, 0.7);
+}
+
+.c-system {
+  color: var(--c-dim);
+  font-size: 12.5px;
+}
+
+.c-error {
+  color: #ff4d6d;
+}
+
+.c-loading::after {
+  content: " ░░░░░░";
+  color: var(--c-cyan);
+  animation: c-load 1.2s steps(1) infinite;
+}
+
+@keyframes c-load {
+  0%   { content: " ░░░░░░"; }
+  17%  { content: " ▓░░░░░"; }
+  33%  { content: " ▓▓░░░░"; }
+  50%  { content: " ▓▓▓░░░"; }
+  67%  { content: " ▓▓▓▓░░"; }
+  83%  { content: " ▓▓▓▓▓░"; }
+}
+
+.c-line.streaming::after {
+  content: "█";
+  color: var(--c-cyan);
+  animation: c-blink 0.8s steps(1) infinite;
+}
+
+@keyframes c-blink {
+  50% { opacity: 0; }
+}
+
+.c-input {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
+  border-top: 1px solid rgba(0, 240, 255, 0.3);
+}
+
+.c-prompt {
+  flex-shrink: 0;
+  color: var(--c-yellow);
+  font-size: 13px;
+}
+
+.c-input input {
+  flex: 1;
+  min-width: 0;
+  color: var(--c-text);
+  font-family: inherit;
+  font-size: 14.5px;
+  background: transparent;
+  border: none;
+  outline: none;
+  caret-color: var(--c-pink);
+}
+
+.c-input input::placeholder {
+  color: #4a5568;
+}
+
+.c-input button {
+  padding: 6px 14px;
+  color: var(--c-yellow);
+  font-family: inherit;
+  font-size: 12px;
+  letter-spacing: 2px;
+  background: transparent;
+  border: 1px solid var(--c-yellow);
+  cursor: pointer;
+}
+
+.c-input button:hover:not(:disabled) {
+  color: #05010a;
+  background: var(--c-yellow);
+}
+
+.c-input button:disabled,
+.c-input input:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.c-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.c-action {
+  color: var(--c-dim);
+  font-family: inherit;
+  font-size: 12px;
+  letter-spacing: 1px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.c-action:hover {
+  color: var(--c-cyan);
+  text-shadow: 0 0 8px var(--c-cyan);
+}
+
+@media (max-width: 600px) {
+  #cyber-site {
+    padding: 12px;
+  }
+
+  .c-messages {
+    padding: 14px;
+  }
+
+  .c-input {
+    padding: 10px 12px;
+  }
+
+  .c-prompt {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .c-scanlines,
+  .c-logo::before,
+  .c-logo::after {
+    animation: none;
+  }
+}
