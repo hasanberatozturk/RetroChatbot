@@ -1,5 +1,6 @@
 // 2030: Nova, kişisel yapay zeka asistanı. Cam efektli modern arayüz + sesli sohbet.
 import { createChat, currentTime, downloadText, loadPreference, pad, savePreference, todayDayMonth } from "./core.js";
+import { chime } from "./sound.js";
 
 const site = document.getElementById("future-site");
 const messagesEl = document.getElementById("future-messages");
@@ -104,7 +105,10 @@ const chat = createChat({
     typing: { minChars: 2, maxChars: 4, tickMs: 16 },
     onReceiving: () => setStatus("Yazıyor..."),
     onSend: stopSpeaking,
-    onReply: speak,
+    onReply(text) {
+      chime();
+      speak(text);
+    },
     showLoading() {
       const bubble = addBubble("", "bot f-typing");
       bubble.setAttribute("aria-label", "Nova yazıyor");

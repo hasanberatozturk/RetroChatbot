@@ -1,5 +1,6 @@
 // 1998: RetroBot, internet kafede gece vardiyasında. 90'lar kişisel web sitesi.
 import { createChat, currentTime, downloadText, pad } from "./core.js";
+import { isMusicPlaying, modem, startMusic, stopMusic } from "./sound.js";
 
 const site = document.getElementById("retro-site");
 const messagesEl = document.getElementById("messages");
@@ -73,6 +74,7 @@ const chat = createChat({
     // 56k modem hızı: birkaç harf, ara sıra takılma
     typing: { minChars: 1, maxChars: 4, tickMs: 35, stallChance: 0.05, stallMs: 350 },
     onReceiving: () => (statusEl.textContent = "▼ Veri alınıyor... 56.6 Kbps"),
+    onSend: modem,
     showLoading: () => addSystemLine("Bağlanıyor... kşşşhhh-diiiii-düüüt...", "system blink"),
     setBusy(busy) {
       inputEl.disabled = busy;
@@ -119,6 +121,24 @@ document.getElementById("retro-export").addEventListener("click", () => {
   downloadText("SOHBET98.LOG", lines.join("\r\n") + "\r\n", "text/plain");
 });
 
+// MIDI çalar: ses ayarından bağımsız, sadece "Çal"a basınca çalar
+const midiButton = document.getElementById("midi-toggle");
+const midiStatus = document.getElementById("midi-status");
+
+function updateMidiPlayer() {
+  const playing = isMusicPlaying();
+  midiButton.textContent = playing ? "■ Durdur" : "▶ Çal";
+  midiButton.setAttribute("aria-pressed", String(playing));
+  midiStatus.textContent = playing ? "♫ çalıyor..." : "durduruldu";
+  midiStatus.classList.toggle("blink", playing);
+}
+
+midiButton.addEventListener("click", () => {
+  if (isMusicPlaying()) stopMusic();
+  else startMusic();
+  updateMidiPlayer();
+});
+
 async function loadVisitorCounter() {
   try {
     const res = await fetch("/api/visit", { method: "POST" });
@@ -140,5 +160,9 @@ export default {
   chat,
   updateClock(now) {
     clockEl.textContent = `${pad(now.getDate())}.${pad(now.getMonth() + 1)}.1998 ${currentTime()}`;
+  },
+  onLeave() {
+    stopMusic();
+    updateMidiPlayer();
   },
 };

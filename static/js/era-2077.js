@@ -1,5 +1,6 @@
 // 2077: ZERO, Neo-İstanbul'da bilgi simsarı. Neon ışıklı siberpunk terminal.
 import { createChat, currentTime, downloadText, pad } from "./core.js";
+import { blip } from "./sound.js";
 
 const site = document.getElementById("cyber-site");
 const messagesEl = document.getElementById("cyber-messages");
@@ -63,7 +64,7 @@ const chat = createChat({
     scroll,
     // Nöral bağlantı hızı: çok hızlı
     typing: { minChars: 3, maxChars: 6, tickMs: 14 },
-    onReceiving() {},
+    onReceiving: blip,
     showLoading: () => addSystem("nöral bağlantı kuruluyor", "c-system c-loading"),
     setBusy(busy) {
       inputEl.disabled = busy;

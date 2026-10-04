@@ -6,6 +6,7 @@ import era2005 from "./era-2005.js";
 import era2030 from "./era-2030.js";
 import era2077 from "./era-2077.js";
 import { openMeeting, setupMeeting } from "./meeting.js";
+import { isSoundOn, onSoundChange, setSoundOn } from "./sound.js";
 
 const ERAS = [era1975, era1998, era2005, era2030, era2077];
 const DEFAULT_ERA = "1998";
@@ -54,8 +55,23 @@ function buildTimeMachines() {
     meet.addEventListener("click", () => openMeeting(currentEra.id));
     years.appendChild(meet);
 
+    const sound = document.createElement("button");
+    sound.type = "button";
+    sound.className = "tm-year tm-sound";
+    sound.addEventListener("click", () => setSoundOn(!isSoundOn()));
+    years.appendChild(sound);
+
     group.append(label, years);
     slot.replaceChildren(group);
+  });
+}
+
+function updateSoundButtons(on) {
+  document.querySelectorAll(".tm-sound").forEach((button) => {
+    button.textContent = on ? "🔊" : "🔇";
+    button.title = on ? "Sesler açık" : "Sesler kapalı";
+    button.setAttribute("aria-label", "Dönem sesleri");
+    button.setAttribute("aria-pressed", String(on));
   });
 }
 
@@ -112,6 +128,8 @@ document.getElementById("modernize-btn").addEventListener("click", () => switchE
 
 buildTimeMachines();
 setupMeeting(ERAS);
+updateSoundButtons(isSoundOn());
+onSoundChange(updateSoundButtons);
 for (const era of ERAS) era.chat.restore();
 
 // Saat göstergeleri: bugünün gün/ay/saati, yıl ise her dönemin kendi yılı

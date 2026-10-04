@@ -1,5 +1,6 @@
 // 1975: Kemal, Beyoğlu'nda plak dükkânında. Daktilo kâğıdına yazılan teleks yazışması.
 import { createChat, downloadText, todayDayMonth } from "./core.js";
+import { typewriterBell, typewriterKey } from "./sound.js";
 
 const site = document.getElementById("seventies-site");
 const messagesEl = document.getElementById("seventies-messages");
@@ -61,8 +62,9 @@ const chat = createChat({
     },
     scroll,
     // Daktilo hızı: düzenli tıkırtı, satır başlarında küçük duraklama
-    typing: { minChars: 1, maxChars: 2, tickMs: 30, stallChance: 0.03, stallMs: 220 },
+    typing: { minChars: 1, maxChars: 2, tickMs: 30, stallChance: 0.03, stallMs: 220, onChar: typewriterKey },
     onReceiving() {},
+    onReply: typewriterBell,
     showLoading: () => addNote("— karşı taraf yazıyor: tık tık tık... —", "s-note s-wait"),
     setBusy(busy) {
       inputEl.disabled = busy;
@@ -70,6 +72,11 @@ const chat = createChat({
       if (!busy) inputEl.focus({ preventScroll: true });
     },
   },
+});
+
+// Kendi yazdıkların da daktilo gibi tıkırdasın
+inputEl.addEventListener("keydown", (event) => {
+  if (event.key.length === 1 || event.key === "Backspace") typewriterKey();
 });
 
 document.getElementById("seventies-clear").addEventListener("click", () => {

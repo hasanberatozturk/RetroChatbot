@@ -1,5 +1,6 @@
 // 2005: Ece, liseli; okuldan sonra anlık mesajlaşma programında. Windows XP havası.
 import { createChat, currentTime, downloadText, reduceMotion, todayDayMonth } from "./core.js";
+import { messengerDing, nudgeBuzz } from "./sound.js";
 
 const NUDGE = "*titreşim gönderdi*";
 const BUDDY = "~*~EcE~*~ ♥";
@@ -92,12 +93,15 @@ const chat = createChat({
     scroll,
     // ADSL hızı: hızlı ama 2030 kadar akıcı değil
     typing: { minChars: 2, maxChars: 5, tickMs: 22 },
-    onReceiving: () => (statusEl.textContent = `✎ ${BUDDY} yazıyor...`),
     showLoading() {
       const typing = document.createElement("span");
       typing.textContent = `✎ ${BUDDY} yazıyor...`;
       statusEl.replaceChildren(typing);
       return typing;
+    },
+    onReceiving() {
+      statusEl.textContent = `✎ ${BUDDY} yazıyor...`;
+      messengerDing();
     },
     onReply() {
       lastReceived = currentTime();
@@ -117,6 +121,7 @@ const chat = createChat({
 nudgeButton.addEventListener("click", () => {
   if (chat.isBusy()) return;
   shakeWindow();
+  nudgeBuzz();
   chat.send(NUDGE);
 });
 

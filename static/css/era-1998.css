@@ -170,6 +170,23 @@ body.era-1998 {
   border: 2px inset #808080;
 }
 
+.midi-player {
+  text-align: center;
+}
+
+.midi-song {
+  color: #00ff00;
+  font-family: "Courier New", monospace;
+  font-size: 13px;
+}
+
+#retro-site .midi-button {
+  margin-top: 6px;
+  padding: 2px 12px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
 .construction {
   padding: 10px 4px;
   color: #000000;
