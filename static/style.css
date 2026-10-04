@@ -1,0 +1,385 @@
+:root {
+  --win-gray: #c0c0c0;
+  --win-light: #ffffff;
+  --win-dark: #808080;
+  --win-darker: #000000;
+  --win-blue: #000080;
+  --link: #00ffff;
+  --link-visited: #ff00ff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+body {
+  margin: 0;
+}
+
+body.retro {
+  padding: 16px;
+  color: #ffff00;
+  font-family: "Comic Sans MS", "Comic Sans", "Chalkboard SE", cursive;
+  /* Yıldızlı döşeme arka plan */
+  background-color: #000033;
+  background-image:
+    radial-gradient(1px 1px at 10px 15px, #ffffff, transparent),
+    radial-gradient(1px 1px at 45px 70px, #ffffcc, transparent),
+    radial-gradient(2px 2px at 80px 30px, #ffffff, transparent),
+    radial-gradient(1px 1px at 120px 95px, #ccccff, transparent),
+    radial-gradient(1px 1px at 150px 50px, #ffffff, transparent);
+  background-size: 170px 120px;
+}
+
+#retro-site a {
+  color: var(--link);
+}
+
+#retro-site a:visited {
+  color: var(--link-visited);
+}
+
+#retro-site a:hover {
+  color: #ffff00;
+  background: #ff0000;
+}
+
+.small {
+  font-size: 12px;
+}
+
+/* ---------- Zaman makinesi butonu ---------- */
+
+.top-bar {
+  display: flex;
+  justify-content: flex-end;
+  max-width: 960px;
+  margin: 0 auto 4px;
+}
+
+#retro-site .modernize-btn {
+  padding: 6px 14px;
+  color: #ff0000;
+  font-family: "Comic Sans MS", "Comic Sans", cursive;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#retro-site .modernize-btn small {
+  color: #000080;
+  font-size: 11px;
+  font-weight: normal;
+}
+
+/* ---------- Başlık ---------- */
+
+.header {
+  max-width: 960px;
+  margin: 0 auto 12px;
+  text-align: center;
+}
+
+.wordart {
+  margin: 8px 0;
+  font-family: Impact, "Arial Black", sans-serif;
+  font-size: clamp(26px, 6vw, 48px);
+  letter-spacing: 2px;
+  color: #ff00ff;
+  text-shadow: 3px 3px 0 #00ffff, 6px 6px 0 #0000ff;
+  animation: rainbow 4s linear infinite;
+}
+
+@keyframes rainbow {
+  0%   { color: #ff00ff; }
+  25%  { color: #ffff00; }
+  50%  { color: #00ff00; }
+  75%  { color: #ff6600; }
+  100% { color: #ff00ff; }
+}
+
+.ticker {
+  display: block;
+  padding: 4px 0;
+  color: #00ff00;
+  font-family: "Courier New", monospace;
+  font-weight: bold;
+  background: #000000;
+  border: 2px ridge #c0c0c0;
+}
+
+/* ---------- Tablo düzeni ---------- */
+
+.layout {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.layout td {
+  vertical-align: top;
+}
+
+.sidebar {
+  width: 210px;
+  padding-right: 16px;
+}
+
+.box {
+  margin-bottom: 16px;
+  padding: 8px;
+  background: #000080;
+  border: 3px ridge #c0c0c0;
+}
+
+.box-title {
+  margin-bottom: 6px;
+  padding: 2px 4px;
+  color: #000000;
+  font-family: "Times New Roman", Times, serif;
+  font-weight: bold;
+  text-align: center;
+  background: #ffff00;
+}
+
+.nav {
+  margin: 0;
+  padding-left: 20px;
+  list-style-type: square;
+  line-height: 1.8;
+}
+
+.new {
+  color: #ff0000;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+.blink {
+  animation: blink 1s steps(1) infinite;
+}
+
+@keyframes blink {
+  50% { visibility: hidden; }
+}
+
+.counter {
+  padding: 4px;
+  color: #00ff00;
+  font-family: "Courier New", monospace;
+  font-size: 24px;
+  font-weight: bold;
+  letter-spacing: 4px;
+  text-align: center;
+  background: #000000;
+  border: 2px inset #808080;
+}
+
+.construction {
+  padding: 10px 4px;
+  color: #000000;
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+  font-weight: bold;
+  text-align: center;
+  background: repeating-linear-gradient(
+    -45deg, #ffcc00 0 14px, #000000 14px 28px
+  );
+  border: 2px solid #000000;
+}
+
+.construction span {
+  display: inline-block;
+  padding: 4px 6px;
+  background: #ffcc00;
+}
+
+/* ---------- Windows 95 sohbet penceresi ---------- */
+
+.window {
+  padding: 3px;
+  color: #000000;
+  font-family: Tahoma, "MS Sans Serif", Arial, sans-serif;
+  font-size: 14px;
+  background: var(--win-gray);
+  border: 2px solid;
+  border-color: var(--win-light) var(--win-darker) var(--win-darker) var(--win-light);
+  box-shadow: inset -1px -1px var(--win-dark), inset 1px 1px #dfdfdf;
+}
+
+.titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 3px 4px;
+  color: #ffffff;
+  font-weight: bold;
+  background: linear-gradient(90deg, var(--win-blue), #1084d0);
+}
+
+.titlebar-buttons button {
+  width: 18px;
+  height: 16px;
+  margin-left: 2px;
+  padding: 0;
+  font-size: 11px;
+  font-weight: bold;
+  line-height: 1;
+  cursor: default;
+}
+
+#retro-site button {
+  color: #000000;
+  font-family: inherit;
+  background: var(--win-gray);
+  border: 2px solid;
+  border-color: var(--win-light) var(--win-darker) var(--win-darker) var(--win-light);
+  box-shadow: inset -1px -1px var(--win-dark);
+}
+
+#retro-site button:active:not(:disabled) {
+  border-color: var(--win-darker) var(--win-light) var(--win-light) var(--win-darker);
+  box-shadow: inset 1px 1px var(--win-dark);
+}
+
+#retro-site button:disabled {
+  color: var(--win-dark);
+  text-shadow: 1px 1px var(--win-light);
+}
+
+.messages {
+  height: 420px;
+  margin: 4px 0;
+  padding: 8px;
+  overflow-y: auto;
+  font-family: "Courier New", Courier, monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  background: #ffffff;
+  border: 2px solid;
+  border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+  box-shadow: inset 1px 1px var(--win-darker);
+}
+
+.line {
+  margin: 0 0 6px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.time {
+  color: #808080;
+}
+
+.nick-user {
+  color: #0000ff;
+  font-weight: bold;
+}
+
+.nick-bot {
+  color: #cc0000;
+  font-weight: bold;
+}
+
+.system {
+  color: #008000;
+  font-style: italic;
+}
+
+.error {
+  color: #ff0000;
+  font-weight: bold;
+}
+
+.input-row {
+  display: flex;
+  gap: 4px;
+}
+
+.input-row input {
+  flex: 1;
+  min-width: 0;
+  padding: 4px 6px;
+  font-family: inherit;
+  font-size: 14px;
+  background: #ffffff;
+  border: 2px solid;
+  border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+  box-shadow: inset 1px 1px var(--win-darker);
+  outline: none;
+}
+
+.input-row button {
+  min-width: 80px;
+  padding: 4px 12px;
+  font-weight: bold;
+}
+
+.statusbar {
+  display: flex;
+  gap: 4px;
+  margin-top: 4px;
+  font-size: 12px;
+}
+
+.status-cell {
+  padding: 2px 6px;
+  border: 1px solid;
+  border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+}
+
+.status-cell:first-child {
+  flex: 1;
+}
+
+/* ---------- Alt bilgi ---------- */
+
+.footer {
+  max-width: 960px;
+  margin: 20px auto 0;
+  color: #c0c0c0;
+  font-family: "Times New Roman", Times, serif;
+  text-align: center;
+}
+
+.footer p {
+  margin: 6px 0;
+}
+
+.webring {
+  padding: 6px;
+  border: 2px groove #c0c0c0;
+}
+
+/* ---------- Telefon ekranları (90'larda yoktu ama olsun) ---------- */
+
+@media (max-width: 700px) {
+  .layout,
+  .layout tbody,
+  .layout tr,
+  .layout td {
+    display: block;
+    width: 100%;
+  }
+
+  .sidebar {
+    padding-right: 0;
+  }
+
+  .main {
+    margin-bottom: 16px;
+  }
+
+  .layout tr {
+    display: flex;
+    flex-direction: column-reverse;
+  }
+
+  .messages {
+    height: 55vh;
+  }
+}

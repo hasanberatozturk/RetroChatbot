@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RetroBot'un Sohbet Odası</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="/static/future.css">
+</head>
+<body class="retro">
+
+  <!-- ===================== 1998 ===================== -->
+  <div id="retro-site">
+    <div class="top-bar">
+      <button type="button" class="modernize-btn" id="modernize-btn">
+        <span class="blink">★</span> MODERNLEŞTİR! <span class="blink">★</span>
+        <br><small>(2030'a ışınlan)</small>
+      </button>
+    </div>
+
+    <div class="header">
+      <h1 class="wordart">~*~ RetroBot'un Sohbet Odası ~*~</h1>
+      <marquee class="ticker" scrollamount="5">
+        *** Sitemize hoş geldiniz! *** Bu site 56k modem için optimize edilmiştir ***
+        Ziyaretçi defterimizi imzalamayı unutmayın! *** RetroBot 7/24 çevrimiçi ***
+      </marquee>
+    </div>
+
+    <table class="layout" cellpadding="0" cellspacing="0">
+      <tr>
+        <td class="sidebar">
+          <div class="box">
+            <div class="box-title">MENÜ</div>
+            <ul class="nav">
+              <li><a href="#" data-construction>Ana Sayfa</a></li>
+              <li><a href="#" data-construction>Hakkımda</a></li>
+              <li><a href="#" data-construction>Ziyaretçi Defteri</a> <span class="blink new">YENİ!</span></li>
+              <li><a href="#" data-construction>Favori Linklerim</a></li>
+              <li><a href="#" data-construction>MIDI Arşivi</a></li>
+            </ul>
+          </div>
+
+          <div class="box">
+            <div class="box-title">ZİYARETÇİ</div>
+            <div class="counter" id="counter">000000</div>
+            <div class="small">kişi bu sayfayı ziyaret etti!</div>
+          </div>
+
+          <div class="construction">
+            <span>⚠ YAPIM AŞAMASINDA ⚠</span>
+          </div>
+        </td>
+
+        <td class="main">
+          <div class="window">
+            <div class="titlebar">
+              <span class="titlebar-text">RetroChat 1.0 - #90lar</span>
+              <span class="titlebar-buttons">
+                <button type="button" tabindex="-1">_</button><button type="button" tabindex="-1">□</button><button type="button" tabindex="-1">×</button>
+              </span>
+            </div>
+
+            <div class="messages" id="messages" aria-live="polite"></div>
+
+            <form class="input-row" id="chat-form" autocomplete="off">
+              <input type="text" id="message-input" maxlength="2000"
+                     placeholder="Mesajını yaz ve ENTER'a bas..." required>
+              <button type="submit" id="send-button">Gönder</button>
+            </form>
+
+            <div class="statusbar">
+              <span class="status-cell" id="status">● Bağlı: 56.6 Kbps</span>
+              <span class="status-cell" id="clock"></span>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+
+    <div class="footer">
+      <p class="webring">
+        <a href="#" data-construction>&lt;&lt; Önceki</a> |
+        <b>90'lar WebRing</b> |
+        <a href="#" data-construction>Sonraki &gt;&gt;</a>
+      </p>
+      <p>En iyi <b>Netscape Navigator 4.0</b> ile <b>800x600</b> çözünürlükte görüntülenir.</p>
+      <p class="small">© 1998 RetroBot. Bu site Not Defteri ile elle kodlanmıştır.</p>
+    </div>
+  </div>
+
+  <!-- ===================== 2030 ===================== -->
+  <div id="future-site" hidden>
+    <div class="f-aurora" aria-hidden="true"></div>
+
+    <header class="f-header">
+      <div class="f-brand">
+        <div class="f-orb" aria-hidden="true"></div>
+        <div>
+          <div class="f-name">Nova</div>
+          <div class="f-status" id="future-status"><span class="f-dot"></span>Çevrimiçi</div>
+        </div>
+      </div>
+      <div class="f-header-right">
+        <span class="f-date" id="future-date"></span>
+        <button type="button" class="f-ghost-btn" id="retro-btn">↺ 1998'e dön</button>
+      </div>
+    </header>
+
+    <main class="f-chat">
+      <div class="f-messages" id="future-messages" aria-live="polite"></div>
+
+      <div class="f-suggestions" id="future-suggestions">
+        <button type="button" class="f-chip">Bugün işe nasıl gitsem?</button>
+        <button type="button" class="f-chip">Hafta sonu için tatil öner</button>
+        <button type="button" class="f-chip">2020'lerde hayat nasıldı?</button>
+        <button type="button" class="f-chip">Akşam yemeği ne yapsam?</button>
+      </div>
+
+      <form class="f-input" id="future-form" autocomplete="off">
+        <input type="text" id="future-input" maxlength="2000"
+               placeholder="Nova'ya bir şey sor..." required>
+        <button type="submit" id="future-send" aria-label="Gönder">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+            <path d="M12 19V5M5 12l7-7 7 7" fill="none" stroke="currentColor"
+                  stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </form>
+    </main>
+  </div>
+
+  <!-- Zaman yolculuğu geçiş efekti -->
+  <div class="warp" id="warp" hidden>
+    <div class="warp-tunnel"></div>
+    <div class="warp-text" id="warp-text"></div>
+  </div>
+
+  <script src="/static/script.js"></script>
+</body>
+</html>

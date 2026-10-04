@@ -1,0 +1,403 @@
+/* ============ 2030 arayüzü ============ */
+
+body.future {
+  --f-bg: #07070d;
+  --f-text: #ecebf5;
+  --f-muted: #9a98b3;
+  --f-glass: rgba(255, 255, 255, 0.045);
+  --f-glass-strong: rgba(255, 255, 255, 0.08);
+  --f-border: rgba(255, 255, 255, 0.09);
+  --f-violet: #7c5cff;
+  --f-cyan: #22d3ee;
+  --f-pink: #f472b6;
+  --f-accent: linear-gradient(135deg, var(--f-violet), var(--f-cyan));
+
+  color: var(--f-text);
+  font-family: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system,
+    "Helvetica Neue", Arial, sans-serif;
+  background: var(--f-bg);
+}
+
+#future-site {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: 100vh;
+  height: 100dvh;
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+/* Arkada yavaşça dalgalanan aurora */
+.f-aurora {
+  position: fixed;
+  inset: -20%;
+  z-index: -1;
+  background:
+    radial-gradient(35% 40% at 20% 25%, rgba(124, 92, 255, 0.35), transparent 70%),
+    radial-gradient(30% 35% at 80% 20%, rgba(34, 211, 238, 0.25), transparent 70%),
+    radial-gradient(40% 40% at 60% 85%, rgba(244, 114, 182, 0.22), transparent 70%);
+  filter: blur(40px);
+  animation: aurora 18s ease-in-out infinite alternate;
+}
+
+@keyframes aurora {
+  from { transform: translate(0, 0) rotate(0deg); }
+  to   { transform: translate(-4%, 3%) rotate(8deg); }
+}
+
+/* ---------- Üst bar ---------- */
+
+.f-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--f-glass);
+  border: 1px solid var(--f-border);
+  border-radius: 20px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.f-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.f-orb {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, var(--f-violet), var(--f-cyan), var(--f-pink), var(--f-violet));
+  box-shadow: 0 0 24px rgba(124, 92, 255, 0.6);
+  animation: orb-spin 6s linear infinite;
+}
+
+.f-orb.thinking {
+  animation-duration: 1.2s;
+  box-shadow: 0 0 32px rgba(34, 211, 238, 0.8);
+}
+
+@keyframes orb-spin {
+  to { transform: rotate(360deg); }
+}
+
+.f-name {
+  font-size: 17px;
+  font-weight: 650;
+  letter-spacing: 0.2px;
+}
+
+.f-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--f-muted);
+  font-size: 13px;
+}
+
+.f-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #34d399;
+  box-shadow: 0 0 8px #34d399;
+}
+
+.f-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.f-date {
+  color: var(--f-muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.f-ghost-btn {
+  padding: 8px 14px;
+  color: var(--f-text);
+  font: inherit;
+  font-size: 13px;
+  background: var(--f-glass-strong);
+  border: 1px solid var(--f-border);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.f-ghost-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ---------- Sohbet kartı ---------- */
+
+.f-chat {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--f-glass);
+  border: 1px solid var(--f-border);
+  border-radius: 28px;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  overflow: hidden;
+}
+
+.f-messages {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 12px;
+  padding: 24px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+
+.f-msg {
+  max-width: 78%;
+  padding: 11px 16px;
+  font-size: 15px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  border-radius: 20px;
+  animation: rise 0.3s ease-out;
+}
+
+.f-msg.user {
+  align-self: flex-end;
+  color: #ffffff;
+  background: var(--f-accent);
+  border-bottom-right-radius: 6px;
+}
+
+.f-msg.bot {
+  align-self: flex-start;
+  background: var(--f-glass-strong);
+  border: 1px solid var(--f-border);
+  border-bottom-left-radius: 6px;
+}
+
+.f-msg.error {
+  align-self: center;
+  padding: 8px 14px;
+  color: #fecaca;
+  font-size: 13px;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  border-radius: 999px;
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Yazıyor... animasyonu */
+.f-typing {
+  display: flex;
+  gap: 5px;
+  padding: 16px 18px;
+}
+
+.f-typing span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--f-muted);
+  animation: bounce 1.2s ease-in-out infinite;
+}
+
+.f-typing span:nth-child(2) { animation-delay: 0.15s; }
+.f-typing span:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes bounce {
+  0%, 60%, 100% { opacity: 0.4; transform: translateY(0); }
+  30%           { opacity: 1;   transform: translateY(-5px); }
+}
+
+/* ---------- Öneri çipleri ---------- */
+
+.f-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0 24px 12px;
+}
+
+.f-chip {
+  padding: 8px 14px;
+  color: var(--f-text);
+  font: inherit;
+  font-size: 13px;
+  background: var(--f-glass);
+  border: 1px solid var(--f-border);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.f-chip:hover {
+  background: var(--f-glass-strong);
+  transform: translateY(-1px);
+}
+
+/* ---------- Mesaj kutusu ---------- */
+
+.f-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 16px 16px;
+  padding: 6px 6px 6px 18px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--f-border);
+  border-radius: 999px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.f-input:focus-within {
+  border-color: rgba(124, 92, 255, 0.6);
+  box-shadow: 0 0 0 4px rgba(124, 92, 255, 0.15);
+}
+
+.f-input input {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 0;
+  color: var(--f-text);
+  font: inherit;
+  font-size: 15px;
+  background: transparent;
+  border: none;
+  outline: none;
+}
+
+.f-input input::placeholder {
+  color: var(--f-muted);
+}
+
+.f-input button {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  color: #ffffff;
+  background: var(--f-accent);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.15s, opacity 0.2s;
+}
+
+.f-input button:hover:not(:disabled) {
+  transform: scale(1.06);
+}
+
+.f-input button:disabled,
+.f-input input:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ---------- Zaman yolculuğu geçişi ---------- */
+
+.warp {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #000000;
+  animation: warp-fade 1.4s ease-in-out forwards;
+}
+
+.warp-tunnel {
+  position: absolute;
+  inset: -50%;
+  background: repeating-conic-gradient(
+    from 0deg,
+    rgba(124, 92, 255, 0.9) 0deg 2deg,
+    transparent 2deg 9deg,
+    rgba(34, 211, 238, 0.8) 9deg 10deg,
+    transparent 10deg 18deg
+  );
+  -webkit-mask: radial-gradient(circle, transparent 8%, #000 60%);
+  mask: radial-gradient(circle, transparent 8%, #000 60%);
+  animation: warp-zoom 1.4s ease-in forwards;
+}
+
+.warp-text {
+  position: relative;
+  padding: 10px 20px;
+  color: #ffffff;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  font-size: clamp(18px, 4vw, 28px);
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-align: center;
+  text-shadow: 0 0 20px rgba(124, 92, 255, 0.9);
+}
+
+@keyframes warp-zoom {
+  from { transform: scale(0.6) rotate(0deg); opacity: 0.4; }
+  to   { transform: scale(2.4) rotate(40deg); opacity: 1; }
+}
+
+@keyframes warp-fade {
+  0%   { opacity: 0; }
+  15%  { opacity: 1; }
+  80%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .f-aurora,
+  .f-orb,
+  .warp-tunnel {
+    animation: none;
+  }
+}
+
+/* ---------- Telefon ---------- */
+
+@media (max-width: 600px) {
+  #future-site {
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .f-date {
+    display: none;
+  }
+
+  .f-messages {
+    padding: 16px;
+  }
+
+  .f-msg {
+    max-width: 88%;
+  }
+
+  .f-suggestions {
+    padding: 0 16px 10px;
+  }
+
+  .f-input {
+    margin: 0 10px 10px;
+  }
+}
