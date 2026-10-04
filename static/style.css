@@ -342,6 +342,12 @@ body.retro {
   border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
 }
 
+#retro-site .status-button {
+  padding: 0 8px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
 .status-cell:first-child {
   flex: 1;
 }

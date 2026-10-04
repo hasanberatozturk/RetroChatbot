@@ -210,7 +210,13 @@ function createChat({ era, formEl, inputEl, ui }) {
     ui.reset();
   }
 
-  return { send, restore, clear, focus: () => inputEl.focus({ preventScroll: true }) };
+  return {
+    send,
+    restore,
+    clear,
+    getHistory: () => history.slice(),
+    focus: () => inputEl.focus({ preventScroll: true }),
+  };
 }
 
 /* ===================== 1998 arayüzü ===================== */
@@ -503,6 +509,58 @@ if (SpeechRecognition) {
     setFutureStatus("Dinliyor...");
   });
 }
+
+/* ===================== Sohbeti dışa aktarma ===================== */
+
+function downloadText(filename, text, type) {
+  const url = URL.createObjectURL(new Blob([text], { type: `${type};charset=utf-8` }));
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+// mIRC tarzı kayıt dosyası; tarih bugünün günü/ayı ama yıl 1998
+function exportRetroLog() {
+  const messages = retroChat.getHistory();
+  if (!messages.length) {
+    alert("Kaydedilecek bir sohbet yok! Önce RetroBot ile biraz laflayın. :)");
+    return;
+  }
+  const now = new Date();
+  const date98 = new Date(1998, now.getMonth(), now.getDate(), now.getHours(), now.getMinutes());
+  const stamp = date98.toDateString().replace(/ (\d{4})$/, ` ${pad(now.getHours())}:${pad(now.getMinutes())}:00 $1`);
+  const lines = [
+    `Session Start: ${stamp}`,
+    "Session Ident: #90lar",
+    "*** #90lar kanalına katıldın.",
+    ...messages.map((m) => `[${m.time || "--:--"}] <${m.role === "user" ? "Sen" : "RetroBot"}> ${m.text}`),
+    `Session Close: ${stamp}`,
+  ];
+  // 90'lar Windows'u: CRLF satır sonu ve 8.3 dosya adı
+  downloadText("SOHBET98.LOG", lines.join("\r\n") + "\r\n", "text/plain");
+}
+
+function exportFutureMarkdown() {
+  const messages = futureChat.getHistory();
+  if (!messages.length) {
+    addBubble("Henüz indirilecek bir sohbet yok. Bir şeyler sorarak başlayabilirsin!", "error");
+    return;
+  }
+  const now = new Date();
+  const dayMonth = now.toLocaleDateString("tr-TR", { day: "numeric", month: "long" });
+  const lines = [`# Nova ile sohbet — ${dayMonth} 2030`, ""];
+  for (const m of messages) {
+    lines.push(`**${m.role === "user" ? "Sen" : "Nova"}** · ${m.time || ""}`, "", m.text, "");
+  }
+  downloadText(`nova-sohbet-2030-${pad(now.getMonth() + 1)}-${pad(now.getDate())}.md`, lines.join("\n"), "text/markdown");
+}
+
+document.getElementById("retro-export").addEventListener("click", exportRetroLog);
+document.getElementById("future-export").addEventListener("click", exportFutureMarkdown);
 
 /* ===================== Saatler ===================== */
 

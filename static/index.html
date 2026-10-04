@@ -71,6 +71,7 @@
             <div class="statusbar">
               <span class="status-cell" id="status">● Bağlı: 56.6 Kbps</span>
               <span class="status-cell" id="clock"></span>
+              <button type="button" class="status-button" id="retro-export" title="Sohbeti diskete kaydet">Kaydet...</button>
             </div>
           </div>
         </td>
@@ -102,6 +103,12 @@
       </div>
       <div class="f-header-right">
         <span class="f-date" id="future-date"></span>
+        <button type="button" class="f-icon-btn" id="future-export" title="Sohbeti indir" aria-label="Sohbeti indir">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3v12M7 10l5 5 5-5M5 21h14"/>
+          </svg>
+        </button>
         <button type="button" class="f-icon-btn" id="future-clear" title="Yeni sohbet" aria-label="Yeni sohbet">
           <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none"
                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
