@@ -5,6 +5,7 @@ import era1998 from "./era-1998.js";
 import era2005 from "./era-2005.js";
 import era2030 from "./era-2030.js";
 import era2077 from "./era-2077.js";
+import { setupKonami, setupStarTrail } from "./easter-eggs.js";
 import { openMeeting, setupMeeting } from "./meeting.js";
 import { isSoundOn, onSoundChange, setSoundOn } from "./sound.js";
 
@@ -130,6 +131,8 @@ buildTimeMachines();
 setupMeeting(ERAS);
 updateSoundButtons(isSoundOn());
 onSoundChange(updateSoundButtons);
+setupKonami();
+setupStarTrail(() => currentEra?.id === "1998");
 for (const era of ERAS) era.chat.restore();
 
 // Saat göstergeleri: bugünün gün/ay/saati, yıl ise her dönemin kendi yılı

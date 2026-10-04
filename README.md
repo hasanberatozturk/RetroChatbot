@@ -14,6 +14,9 @@ geçiş yaparsın; her dönemin hem kişiliği hem de arayüzü o yıla göre ta
 Cevaplar akışla gelir ve her dönemin hızında harf harf yazılır. Sohbetler tarayıcıda
 saklanır ve her dönemden dosya olarak indirilebilir.
 
+**Gizli sürprizler:** 1998 ya da 2005 sohbetinde `format c:` yazmayı dene, klavyede
+↑↑↓↓←→←→BA tuşla (Konami kodu) ya da 1998'de fareyi gezdir.
+
 **⚡ Zaman Buluşması:** iki dönemin botunu seçersin, birbirleriyle 6 mesajlık bir sohbet
 yaparlar (ör. 1975'teki Kemal ile 2077'deki ZERO müzik konuşur). Her mesaj bir Gemini isteği kullanır.
 

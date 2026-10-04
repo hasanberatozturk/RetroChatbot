@@ -1,5 +1,6 @@
 // 2005: Ece, liseli; okuldan sonra anlık mesajlaşma programında. Windows XP havası.
 import { createChat, currentTime, downloadText, reduceMotion, todayDayMonth } from "./core.js";
+import { isFormatCommand, showBsod } from "./easter-eggs.js";
 import { messengerDing, nudgeBuzz } from "./sound.js";
 
 const NUDGE = "*titreşim gönderdi*";
@@ -77,6 +78,16 @@ const chat = createChat({
   ui: {
     networkErrorText: "İletiniz aşağıdaki alıcılara teslim edilemedi: ~*~EcE~*~ ♥",
     addUser,
+    intercept(text) {
+      if (!isFormatCommand(text)) return false;
+      addUser(text);
+      showBsod("xp", () => {
+        addSystem("Windows bir hata nedeniyle yeniden başlatıldı. Hata raporu Microsoft'a gönderilsin mi?");
+        addMessage(BUDDY, "ayyy napıyosun yaaa :S bilgisayarın gitti sanırım xD", "n-from-buddy");
+        inputEl.focus({ preventScroll: true });
+      });
+      return true;
+    },
     addError: (text) => addSystem(text, "n-system n-error"),
     renderSaved({ role, text }) {
       if (role === "user") addUser(text);

@@ -132,7 +132,8 @@ export function createTyper(textNode, onUpdate, options = {}) {
  *   addUser(text), addError(text), renderSaved(message), reset(),
  *   showLoading() -> element, startBot() -> { element, textNode },
  *   scroll(), setBusy(busy), onReceiving(), typing (createTyper ayarları),
- *   networkErrorText, isteğe bağlı: onSend(), onReply(text), onRestore()
+ *   networkErrorText, isteğe bağlı: onSend(), onReply(text), onRestore(),
+ *   intercept(text) -> true dönerse mesaj bota gönderilmez
  */
 export function createChat({ era, formEl, inputEl, ui }) {
   const history = loadSavedChat(era);
@@ -229,6 +230,8 @@ export function createChat({ era, formEl, inputEl, ui }) {
     const text = inputEl.value.trim();
     if (!text || busy) return;
     inputEl.value = "";
+    // Dönem bu mesajı kendisi işleyebilir (ör. "format c:" mavi ekranı); o zaman bota gitmez
+    if (ui.intercept?.(text)) return;
     send(text);
   });
 

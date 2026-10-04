@@ -1,5 +1,6 @@
 // 1998: RetroBot, internet kafede gece vardiyasında. 90'lar kişisel web sitesi.
 import { createChat, currentTime, downloadText, pad } from "./core.js";
+import { isFormatCommand, showBsod } from "./easter-eggs.js";
 import { isMusicPlaying, modem, startMusic, stopMusic } from "./sound.js";
 
 const site = document.getElementById("retro-site");
@@ -75,6 +76,16 @@ const chat = createChat({
     typing: { minChars: 1, maxChars: 4, tickMs: 35, stallChance: 0.05, stallMs: 350 },
     onReceiving: () => (statusEl.textContent = "▼ Veri alınıyor... 56.6 Kbps"),
     onSend: modem,
+    intercept(text) {
+      if (!isFormatCommand(text)) return false;
+      addChatLine("Sen", text, "nick-user");
+      showBsod("98", () => {
+        addSystemLine("Bilgisayar yeniden başlatıldı. ScanDisk diski denetliyor...");
+        addChatLine("RetroBot", "Ne yaptın sen?! Az kalsın bütün disketlerim gidiyordu :( Bir daha format atma lütfen!", "nick-bot");
+        inputEl.focus({ preventScroll: true });
+      });
+      return true;
+    },
     showLoading: () => addSystemLine("Bağlanıyor... kşşşhhh-diiiii-düüüt...", "system blink"),
     setBusy(busy) {
       inputEl.disabled = busy;
