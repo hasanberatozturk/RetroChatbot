@@ -57,6 +57,18 @@ yaparlar (ör. 1975'teki Kemal ile 2077'deki ZERO müzik konuşur). Her mesaj bi
 Ücretsiz planda kota **model başına** sayılır (ör. günde 20 istek). Bir modelin kotası dolunca
 Google'ın bildirdiği bekleme süresi boyunca o model atlanır ve sıradaki modele geçilir.
 
+## Testler
+
+Backend testleri Gemini'ye gerçek istek atmaz; sahte cevaplarla çalışır, kotanı harcamaz.
+
+```bash
+.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
+.venv\Scripts\python.exe -m pytest
+```
+
+Kapsananlar: sohbet ve akış endpoint'leri, yedek model zinciri ve kota takibi, istek
+sınırları, ziyaretçi defteri ve sayaç, dönem kişilikleri.
+
 ## İnternete yükleme (Render)
 
 Proje [Render](https://render.com)'ın ücretsiz planına göre ayarlandı (`render.yaml`).
