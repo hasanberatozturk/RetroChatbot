@@ -1,17 +1,19 @@
+import json
 from pathlib import Path
 from typing import Literal
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from google.genai import errors as genai_errors
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 BASE_DIR = Path(__file__).parent
 load_dotenv(BASE_DIR / ".env")
 
-from gemini_client import AllModelsBusyError, ask_gemini  # noqa: E402  (.env yüklendikten sonra)
+from gemini_client import AllModelsBusyError, ask_gemini, stream_gemini  # noqa: E402
+from prompts import PROMPTS  # noqa: E402
 
 STATIC_DIR = BASE_DIR / "static"
 MAX_HISTORY = 20  # Gemini'ye gönderilen en fazla geçmiş mesaj sayısı
@@ -19,6 +21,8 @@ EMPTY_REPLIES = {
     "retro": "Hmm, modem bağlantısı koptu galiba... Bir daha yazar mısın? :)",
     "future": "Nöral bağlantıda kısa bir parazit oldu, tekrar sorar mısın?",
 }
+DEFAULT_EMPTY_REPLY = "Bağlantıda bir sorun oldu, tekrar dener misin?"
+
 
 def busy_message(retry_after: float | None) -> str:
     if retry_after is None or retry_after <= 0:
@@ -29,6 +33,14 @@ def busy_message(retry_after: float | None) -> str:
     else:
         wait = f"yaklaşık {minutes} dakika"
     return f"Günlük ücretsiz Gemini kotası doldu. {wait} sonra tekrar dener misin?"
+
+
+def to_http_error(error: Exception) -> HTTPException:
+    if isinstance(error, AllModelsBusyError):
+        return HTTPException(status_code=429, detail=busy_message(error.retry_after))
+    if isinstance(error, genai_errors.APIError):
+        return HTTPException(status_code=502, detail=f"Gemini hatası: {error.message}")
+    return HTTPException(status_code=500, detail=str(error))
 
 
 app = FastAPI(title="RetroChatbot")
@@ -45,7 +57,17 @@ class HistoryItem(BaseModel):
 class ChatRequest(BaseModel):
     message: str = Field(min_length=1, max_length=2000)
     history: list[HistoryItem] = []
-    era: Literal["retro", "future"] = "retro"
+    era: str = "retro"
+
+    @field_validator("era")
+    @classmethod
+    def era_must_exist(cls, value: str) -> str:
+        if value not in PROMPTS:
+            raise ValueError(f"Bilinmeyen dönem: {value}")
+        return value
+
+    def trimmed_history(self) -> list[dict]:
+        return [item.model_dump() for item in self.history[-MAX_HISTORY:]]
 
 
 class ChatResponse(BaseModel):
@@ -66,19 +88,42 @@ async def visit():
 
 @app.post("/api/chat", response_model=ChatResponse)
 async def chat(req: ChatRequest):
-    history = [item.model_dump() for item in req.history[-MAX_HISTORY:]]
     try:
-        reply = await ask_gemini(req.message, history, req.era)
-    except AllModelsBusyError as e:
-        raise HTTPException(status_code=429, detail=busy_message(e.retry_after))
-    except RuntimeError as e:
-        raise HTTPException(status_code=500, detail=str(e))
-    except genai_errors.APIError as e:
-        raise HTTPException(status_code=502, detail=f"Gemini hatası: {e.message}")
+        reply = await ask_gemini(req.message, req.trimmed_history(), req.era)
+    except (AllModelsBusyError, RuntimeError, genai_errors.APIError) as e:
+        raise to_http_error(e)
 
-    if not reply:
-        reply = EMPTY_REPLIES[req.era]
-    return ChatResponse(reply=reply)
+    return ChatResponse(reply=reply or EMPTY_REPLIES.get(req.era, DEFAULT_EMPTY_REPLY))
+
+
+def ndjson(event: dict) -> str:
+    return json.dumps(event, ensure_ascii=False) + "\n"
+
+
+@app.post("/api/chat/stream")
+async def chat_stream(req: ChatRequest):
+    """Cevabı satır satır JSON olayları (NDJSON) halinde akıtır:
+    {"type": "chunk", "text": "..."} ... {"type": "done"}
+    Akış ortasında hata olursa: {"type": "error", "message": "..."}"""
+    try:
+        chunks = await stream_gemini(req.message, req.trimmed_history(), req.era)
+    except (AllModelsBusyError, RuntimeError, genai_errors.APIError) as e:
+        raise to_http_error(e)
+
+    async def events():
+        got_text = False
+        try:
+            async for text in chunks:
+                got_text = True
+                yield ndjson({"type": "chunk", "text": text})
+        except genai_errors.APIError as e:
+            yield ndjson({"type": "error", "message": f"Bağlantı yarıda kesildi: {e.message}"})
+            return
+        if not got_text:
+            yield ndjson({"type": "chunk", "text": EMPTY_REPLIES.get(req.era, DEFAULT_EMPTY_REPLY)})
+        yield ndjson({"type": "done"})
+
+    return StreamingResponse(events(), media_type="application/x-ndjson")
 
 
 if __name__ == "__main__":

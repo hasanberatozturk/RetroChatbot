@@ -2,6 +2,8 @@ import logging
 import os
 import re
 import time
+from collections.abc import AsyncIterator, Awaitable, Callable
+from typing import TypeVar
 
 from google import genai
 from google.genai import errors, types
@@ -17,6 +19,8 @@ DEFAULT_FALLBACK_MODELS = (
 DEFAULT_COOLDOWN = 60  # Google bekleme süresi bildirmezse kaç saniye atlanacak
 
 logger = logging.getLogger("uvicorn.error")  # uvicorn'un terminal çıktısına yazar
+
+T = TypeVar("T")
 
 _client: genai.Client | None = None
 # Kotası dolan modeller: {model adı: tekrar denenebileceği zaman (time.time())}
@@ -58,26 +62,29 @@ def _retry_delay_seconds(error: errors.APIError) -> float:
     return float(match.group(1)) if match else DEFAULT_COOLDOWN
 
 
-async def ask_gemini(message: str, history: list[dict], era: str = "retro") -> str:
+def _build_request(message: str, history: list[dict], era: str):
     """history: [{"role": "user" | "model", "text": "..."}] (en eskiden en yeniye)
-    era: "retro" (1998) veya "future" (2030)"""
+    era: PROMPTS içindeki dönem anahtarı (ör. "retro", "future")"""
     contents = [
         types.Content(role=item["role"], parts=[types.Part(text=item["text"])])
         for item in history
     ]
     contents.append(types.Content(role="user", parts=[types.Part(text=message)]))
     config = types.GenerateContentConfig(system_instruction=PROMPTS[era], temperature=0.9)
+    return contents, config
 
+
+async def _with_fallback(call: Callable[[str], Awaitable[T]]) -> T:
+    """call(model) fonksiyonunu modelleri sırayla deneyerek çalıştırır.
+    Kotası dolan ya da yoğun olan modeller atlanır."""
     now = time.time()
     for model in get_models():
         if _cooldowns.get(model, 0) > now:
             continue  # Bu modelin kotası dolu, bekleme süresi bitmedi
         try:
-            response = await get_client().aio.models.generate_content(
-                model=model, contents=contents, config=config
-            )
+            result = await call(model)
             logger.info("Gemini: %s cevap verdi", model)
-            return (response.text or "").strip()
+            return result
         except errors.ServerError as e:
             logger.warning("Gemini: %s yoğun (%s), sıradaki modele geçiliyor", model, e.code)
             continue
@@ -95,3 +102,44 @@ async def ask_gemini(message: str, history: list[dict], era: str = "retro") -> s
 
     waits = [t - time.time() for t in _cooldowns.values() if t != float("inf")]
     raise AllModelsBusyError(min(waits) if waits else None)
+
+
+async def ask_gemini(message: str, history: list[dict], era: str = "retro") -> str:
+    """Cevabın tamamını tek seferde döndürür."""
+    contents, config = _build_request(message, history, era)
+
+    async def call(model: str) -> str:
+        response = await get_client().aio.models.generate_content(
+            model=model, contents=contents, config=config
+        )
+        return (response.text or "").strip()
+
+    return await _with_fallback(call)
+
+
+async def stream_gemini(
+    message: str, history: list[dict], era: str = "retro"
+) -> AsyncIterator[str]:
+    """Cevabı parça parça veren bir async iterator döndürür.
+
+    İlk parça gelene kadar beklenir; böylece kota/yoğunluk hataları burada
+    yakalanıp yedek modele geçilebilir ve endpoint düzgün bir HTTP hatası dönebilir."""
+    contents, config = _build_request(message, history, era)
+
+    async def call(model: str):
+        stream = await get_client().aio.models.generate_content_stream(
+            model=model, contents=contents, config=config
+        )
+        first = await anext(stream, None)
+        return first, stream
+
+    first, stream = await _with_fallback(call)
+
+    async def chunks() -> AsyncIterator[str]:
+        if first is not None and first.text:
+            yield first.text
+        async for chunk in stream:
+            if chunk.text:
+                yield chunk.text
+
+    return chunks()

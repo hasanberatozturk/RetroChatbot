@@ -275,6 +275,12 @@ body.retro {
   color: #808080;
 }
 
+/* Cevap gelirken satır sonunda yanıp sönen blok imleç */
+.line.streaming::after {
+  content: "█";
+  animation: blink 1s steps(1) infinite;
+}
+
 .nick-user {
   color: #0000ff;
   font-weight: bold;

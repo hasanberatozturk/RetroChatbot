@@ -7,7 +7,70 @@ function pad(n) {
   return String(n).padStart(2, "0");
 }
 
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
 /* ===================== Ortak sohbet mantığı ===================== */
+
+// Sunucudan gelen NDJSON akışını satır satır olaylara çevirir
+async function* readEvents(response) {
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+  while (true) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    let newline;
+    while ((newline = buffer.indexOf("\n")) >= 0) {
+      const line = buffer.slice(0, newline).trim();
+      buffer = buffer.slice(newline + 1);
+      if (line) yield JSON.parse(line);
+    }
+  }
+}
+
+// Gelen metni harf harf ekrana yazar. Hız ayarları her dönemde farklı.
+function createTyper(textNode, onUpdate, options = {}) {
+  const { minChars = 2, maxChars = 2, tickMs = 16, stallChance = 0, stallMs = 0 } = options;
+  let queue = "";
+  let ended = false;
+  let timer = null;
+  let resolveDone;
+  const done = new Promise((resolve) => (resolveDone = resolve));
+
+  function tick() {
+    timer = null;
+    if (queue) {
+      const n = minChars + Math.floor(Math.random() * (maxChars - minChars + 1));
+      textNode.data += queue.slice(0, n);
+      queue = queue.slice(n);
+      onUpdate();
+    }
+    if (queue) {
+      // Ara sıra takılma: eski modemlerin kesik kesik veri getirmesi gibi
+      timer = setTimeout(tick, Math.random() < stallChance ? stallMs : tickMs);
+    } else if (ended) {
+      resolveDone();
+    }
+  }
+
+  return {
+    push(text) {
+      if (reduceMotion) {
+        textNode.data += text;
+        onUpdate();
+        return;
+      }
+      queue += text;
+      if (!timer) timer = setTimeout(tick, tickMs);
+    },
+    end() {
+      ended = true;
+      if (!queue && !timer) resolveDone();
+      return done;
+    },
+  };
+}
 
 // Her dönemin kendi geçmişi var; 1998 botu 2030 konuşmasını görmez (ve tersi).
 function createChat({ era, formEl, inputEl, ui }) {
@@ -17,26 +80,63 @@ function createChat({ era, formEl, inputEl, ui }) {
     ui.addUser(text);
     ui.setBusy(true);
     const loadingEl = ui.showLoading();
+    const removeLoading = () => loadingEl.isConnected && loadingEl.remove();
+
+    let typer = null;
+    let botEl = null;
+    let reply = "";
+    let finished = false;
+
+    async function finishTyping() {
+      if (!typer) return;
+      await typer.end();
+      botEl.classList.remove("streaming");
+    }
 
     try {
-      const res = await fetch("/api/chat", {
+      const res = await fetch("/api/chat/stream", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: text, history, era }),
       });
-      const data = await res.json().catch(() => ({}));
-      loadingEl.remove();
 
       if (!res.ok) {
-        const detail = typeof data.detail === "string" ? data.detail : `Sunucu hatası (${res.status})`;
-        ui.addError(detail);
+        const data = await res.json().catch(() => ({}));
+        removeLoading();
+        ui.addError(typeof data.detail === "string" ? data.detail : `Sunucu hatası (${res.status})`);
         return;
       }
 
-      history.push({ role: "user", text }, { role: "model", text: data.reply });
-      ui.addBot(data.reply);
+      for await (const event of readEvents(res)) {
+        if (event.type === "chunk") {
+          if (!typer) {
+            removeLoading();
+            ui.onReceiving();
+            const bot = ui.startBot();
+            botEl = bot.element;
+            botEl.classList.add("streaming");
+            typer = createTyper(bot.textNode, ui.scroll, ui.typing);
+          }
+          reply += event.text;
+          typer.push(event.text);
+        } else if (event.type === "error") {
+          await finishTyping();
+          ui.addError(event.message);
+          return;
+        } else if (event.type === "done") {
+          finished = true;
+        }
+      }
+
+      await finishTyping();
+      if (!finished) {
+        ui.addError(ui.networkErrorText);
+        return;
+      }
+      history.push({ role: "user", text }, { role: "model", text: reply });
     } catch {
-      loadingEl.remove();
+      removeLoading();
+      await finishTyping();
       ui.addError(ui.networkErrorText);
     } finally {
       ui.setBusy(false);
@@ -102,8 +202,15 @@ const retroChat = createChat({
   ui: {
     networkErrorText: "Bağlantı koptu! Biri telefonu mu kaldırdı?",
     addUser: (text) => addChatLine("Sen", text, "nick-user"),
-    addBot: (text) => addChatLine("RetroBot", text, "nick-bot"),
     addError: (text) => addSystemLine(`HATA: ${text}`, "error"),
+    startBot() {
+      const element = addChatLine("RetroBot", "", "nick-bot");
+      return { element, textNode: element.lastChild };
+    },
+    scroll: retroScroll,
+    // 56k modem hızı: birkaç harf, ara sıra takılma
+    typing: { minChars: 1, maxChars: 4, tickMs: 35, stallChance: 0.05, stallMs: 350 },
+    onReceiving: () => (retroStatusEl.textContent = "▼ Veri alınıyor... 56.6 Kbps"),
     showLoading: () => addSystemLine("Bağlanıyor... kşşşhhh-diiiii-düüüt...", "system blink"),
     setBusy(busy) {
       retroInputEl.disabled = busy;
@@ -167,8 +274,16 @@ const futureChat = createChat({
       futureSuggestionsEl.hidden = true;
       addBubble(text, "user");
     },
-    addBot: (text) => addBubble(text, "bot"),
     addError: (text) => addBubble(text, "error"),
+    startBot() {
+      const element = addBubble("", "bot");
+      const textNode = document.createTextNode("");
+      element.appendChild(textNode);
+      return { element, textNode };
+    },
+    scroll: () => (futureMessagesEl.scrollTop = futureMessagesEl.scrollHeight),
+    typing: { minChars: 2, maxChars: 4, tickMs: 16 },
+    onReceiving: () => setFutureStatus("Yazıyor..."),
     showLoading() {
       const bubble = addBubble("", "bot f-typing");
       bubble.setAttribute("aria-label", "Nova yazıyor");
@@ -213,7 +328,6 @@ const retroSite = document.getElementById("retro-site");
 const futureSite = document.getElementById("future-site");
 const warpEl = document.getElementById("warp");
 const warpTextEl = document.getElementById("warp-text");
-const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 let switching = false;
 
 function applyMode(mode) {
