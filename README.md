@@ -48,6 +48,7 @@ yaparlar (ör. 1975'teki Kemal ile 2077'deki ZERO müzik konuşur). Her mesaj bi
 | `GEMINI_API_KEY` | Gemini API anahtarın (zorunlu) |
 | `GEMINI_MODEL` | Önce denenen model, ör. `gemini-3.8-flash` |
 | `GEMINI_FALLBACK_MODELS` | Virgülle ayrılmış yedek modeller. Ana modelin kotası dolarsa ya da model yoğunsa sırayla bunlar denenir. |
+| `DATABASE_PATH` | SQLite dosyasının yolu (varsayılan: `data/retrochatbot.db`) |
 
 Ücretsiz planda kota **model başına** sayılır (ör. günde 20 istek). Bir modelin kotası dolunca
 Google'ın bildirdiği bekleme süresi boyunca o model atlanır ve sıradaki modele geçilir.
@@ -57,6 +58,8 @@ Google'ın bildirdiği bekleme süresi boyunca o model atlanır ve sıradaki mod
 ```
 main.py              FastAPI uygulaması ve API endpoint'leri
 gemini_client.py     Gemini istekleri (normal ve akışlı), yedek model zinciri, kota takibi
+database.py          SQLite: ziyaretçi defteri ve ziyaretçi sayacı (data/retrochatbot.db)
+rate_limit.py        Bellek içi istek sınırlayıcı
 prompts.py           Her dönemin kişiliği (system prompt), yıl anahtarıyla
 static/index.html    Beş dönemin sayfa iskeleti
 static/css/          base.css (ortak) + her dönemin kendi stili (era-1975.css ...)
@@ -76,4 +79,6 @@ Yeni bir dönem eklemek için: `prompts.py`'a kişiliği, `index.html`'e bir bö
 | `GET /` | Arayüz |
 | `POST /api/chat` | `{ "message": "...", "history": [...], "era": "1998" }` → `{ "reply": "..." }` |
 | `POST /api/chat/stream` | Aynı istek; cevap NDJSON olarak parça parça gelir: `{"type": "chunk", "text": "..."}` ... `{"type": "done"}` |
-| `POST /api/visit` | Ziyaretçi sayacını bir artırır |
+| `POST /api/visit` | Ziyaretçi sayacını bir artırır (kalıcı) |
+| `GET /api/guestbook` | Ziyaretçi defteri kayıtları, en yeniden eskiye |
+| `POST /api/guestbook` | `{ "name": "...", "city": "...", "message": "..." }` ile deftere yazar (kişi başı 30 sn'de 1) |

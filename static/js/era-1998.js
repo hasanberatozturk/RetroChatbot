@@ -139,6 +139,114 @@ midiButton.addEventListener("click", () => {
   updateMidiPlayer();
 });
 
+/* ---------- Ziyaretçi defteri ---------- */
+
+const chatView = document.getElementById("retro-chat-view");
+const guestbookView = document.getElementById("retro-guestbook-view");
+const gbForm = document.getElementById("gb-form");
+const gbSubmit = document.getElementById("gb-submit");
+const gbFeedback = document.getElementById("gb-feedback");
+const gbEntries = document.getElementById("gb-entries");
+
+// Kayıt tarihi gerçek, ama yıl her zaman 1998 görünsün
+function formatEntryDate(iso) {
+  const date = new Date(iso);
+  return `${pad(date.getDate())}.${pad(date.getMonth() + 1)}.1998 ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
+function renderEntries(entries) {
+  if (!entries.length) {
+    const empty = document.createElement("p");
+    empty.className = "gb-empty";
+    empty.textContent = "Henüz kimse yazmamış... İlk imzayı sen at!";
+    gbEntries.replaceChildren(empty);
+    return;
+  }
+  gbEntries.replaceChildren(
+    ...entries.map((entry) => {
+      const box = document.createElement("div");
+      box.className = "gb-entry";
+      const head = document.createElement("div");
+      head.className = "gb-entry-head";
+      const name = document.createElement("b");
+      name.textContent = entry.name;
+      head.append(`#${entry.id} · `, name);
+      if (entry.city) head.append(` (${entry.city})`);
+      head.append(` · ${formatEntryDate(entry.created_at)}`);
+      const msg = document.createElement("div");
+      msg.className = "gb-entry-msg";
+      msg.textContent = entry.message;
+      box.append(head, msg);
+      return box;
+    })
+  );
+}
+
+function setFeedback(text, isError = false) {
+  gbFeedback.textContent = text;
+  gbFeedback.classList.toggle("error", isError);
+}
+
+async function loadEntries() {
+  gbEntries.textContent = "Yükleniyor... lütfen bekleyin...";
+  try {
+    const res = await fetch("/api/guestbook");
+    const data = await res.json();
+    renderEntries(data.entries);
+  } catch {
+    gbEntries.textContent = "Defter yüklenemedi! Sayfayı yenilemeyi dene.";
+  }
+}
+
+gbForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const entry = {
+    name: document.getElementById("gb-name").value,
+    city: document.getElementById("gb-city").value,
+    message: document.getElementById("gb-message").value,
+  };
+  gbSubmit.disabled = true;
+  setFeedback("Gönderiliyor...");
+  try {
+    const res = await fetch("/api/guestbook", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(entry),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      setFeedback(typeof data.detail === "string" ? data.detail : "Deftere yazılamadı, alanları kontrol et!", true);
+      return;
+    }
+    gbForm.reset();
+    setFeedback("Teşekkürler! Deftere yazıldın :)");
+    loadEntries();
+  } catch {
+    setFeedback("Bağlantı koptu! Tekrar dene.", true);
+  } finally {
+    gbSubmit.disabled = false;
+  }
+});
+
+function showView(view) {
+  const isGuestbook = view === "guestbook";
+  chatView.hidden = isGuestbook;
+  guestbookView.hidden = !isGuestbook;
+  if (isGuestbook) {
+    setFeedback("");
+    loadEntries();
+  } else {
+    chat.focus();
+  }
+}
+
+site.querySelectorAll("[data-view]").forEach((link) => {
+  link.addEventListener("click", (event) => {
+    event.preventDefault();
+    showView(link.dataset.view);
+  });
+});
+
 async function loadVisitorCounter() {
   try {
     const res = await fetch("/api/visit", { method: "POST" });

@@ -1,19 +1,23 @@
 import json
+import math
+from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Literal
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from google.genai import errors as genai_errors
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 BASE_DIR = Path(__file__).parent
 load_dotenv(BASE_DIR / ".env")
 
+import database  # noqa: E402
 from gemini_client import AllModelsBusyError, ask_gemini, stream_gemini  # noqa: E402
 from prompts import PROMPTS  # noqa: E402
+from rate_limit import RateLimiter  # noqa: E402
 
 STATIC_DIR = BASE_DIR / "static"
 MAX_HISTORY = 20  # Gemini'ye gönderilen en fazla geçmiş mesaj sayısı
@@ -46,10 +50,22 @@ def to_http_error(error: Exception) -> HTTPException:
     return HTTPException(status_code=500, detail=str(error))
 
 
-app = FastAPI(title="RetroChatbot")
-app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+# Ziyaretçi defterine aynı kişi 30 saniyede en fazla 1 kez yazabilir
+guestbook_limiter = RateLimiter(max_requests=1, per_seconds=30)
 
-visitor_count = 0
+
+def client_ip(request: Request) -> str:
+    return request.client.host if request.client else "bilinmiyor"
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    database.init_db()
+    yield
+
+
+app = FastAPI(title="RetroChatbot", lifespan=lifespan)
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 
 class HistoryItem(BaseModel):
@@ -77,16 +93,38 @@ class ChatResponse(BaseModel):
     reply: str
 
 
+class GuestbookEntryIn(BaseModel):
+    model_config = ConfigDict(str_strip_whitespace=True)
+
+    name: str = Field(min_length=1, max_length=40)
+    city: str = Field(default="", max_length=40)
+    message: str = Field(min_length=1, max_length=500)
+
+
 @app.get("/")
 async def index():
     return FileResponse(STATIC_DIR / "index.html")
 
 
 @app.post("/api/visit")
-async def visit():
-    global visitor_count
-    visitor_count += 1
-    return {"count": visitor_count}
+def visit():
+    return {"count": database.increment_counter("visitors")}
+
+
+@app.get("/api/guestbook")
+def guestbook_list(limit: int = 50):
+    return {"entries": database.list_guestbook_entries(max(1, min(limit, 100)))}
+
+
+@app.post("/api/guestbook", status_code=201)
+def guestbook_add(entry: GuestbookEntryIn, request: Request):
+    retry_after = guestbook_limiter.check(client_ip(request))
+    if retry_after is not None:
+        raise HTTPException(
+            status_code=429,
+            detail=f"Biraz yavaş! Deftere tekrar yazmak için {math.ceil(retry_after)} saniye bekle.",
+        )
+    return database.add_guestbook_entry(entry.name, entry.city, entry.message)
 
 
 @app.post("/api/chat", response_model=ChatResponse)

@@ -111,7 +111,7 @@ body.era-1998 {
   margin: 0 auto;
 }
 
-.layout td {
+.layout > tbody > tr > td {
   vertical-align: top;
 }
 
@@ -383,9 +383,9 @@ body.era-1998 {
 
 @media (max-width: 700px) {
   .layout,
-  .layout tbody,
-  .layout tr,
-  .layout td {
+  .layout > tbody,
+  .layout > tbody > tr,
+  .layout > tbody > tr > td {
     display: block;
     width: 100%;
   }
@@ -398,7 +398,7 @@ body.era-1998 {
     margin-bottom: 16px;
   }
 
-  .layout tr {
+  .layout > tbody > tr {
     display: flex;
     flex-direction: column-reverse;
   }
@@ -439,4 +439,116 @@ body.era-1998 {
   color: #ffffff;
   background: var(--win-blue);
   cursor: default;
+}
+
+/* ---------- Ziyaretçi defteri ---------- */
+
+.guestbook {
+  padding: 12px 16px;
+  color: #ffffff;
+  font-family: "Times New Roman", Times, serif;
+  background: #000066;
+  border: 3px ridge #c0c0c0;
+}
+
+.gb-title {
+  margin: 4px 0 8px;
+  color: #ffff00;
+  font-family: "Comic Sans MS", "Comic Sans", cursive;
+  font-size: 28px;
+  text-align: center;
+  text-shadow: 2px 2px 0 #ff00ff;
+}
+
+.gb-intro {
+  margin: 0 0 12px;
+  text-align: center;
+}
+
+.gb-table {
+  width: 100%;
+  color: #000000;
+  font-family: Tahoma, "MS Sans Serif", Arial, sans-serif;
+  font-size: 13px;
+  background: var(--win-gray);
+  border: 2px solid;
+  border-color: var(--win-light) var(--win-darker) var(--win-darker) var(--win-light);
+}
+
+.gb-table td:first-child {
+  width: 80px;
+  font-weight: bold;
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+.gb-table input,
+.gb-table textarea {
+  width: 100%;
+  padding: 3px 4px;
+  font-family: inherit;
+  font-size: 13px;
+  background: #ffffff;
+  border: 2px solid;
+  border-color: var(--win-dark) var(--win-light) var(--win-light) var(--win-dark);
+  resize: vertical;
+}
+
+#retro-site .gb-table button {
+  padding: 3px 12px;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.gb-feedback {
+  min-height: 18px;
+  margin: 6px 0 0;
+  color: #00ff00;
+  font-weight: bold;
+}
+
+.gb-feedback.error {
+  color: #ff6666;
+}
+
+.gb-rule {
+  height: 4px;
+  margin: 16px 0;
+  background: linear-gradient(90deg, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff);
+  border: none;
+}
+
+.gb-entry {
+  margin-bottom: 12px;
+  padding: 8px 10px;
+  background: #000044;
+  border: 2px dotted #00ffff;
+}
+
+.gb-entry:nth-child(even) {
+  background: #220044;
+  border-color: #ff00ff;
+}
+
+.gb-entry-head {
+  margin-bottom: 4px;
+  color: #ffff00;
+  font-size: 13px;
+}
+
+.gb-entry-msg {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.gb-empty {
+  color: #c0c0c0;
+  font-style: italic;
+  text-align: center;
+}
+
+.gb-back {
+  margin: 12px 0 0;
+  text-align: center;
 }

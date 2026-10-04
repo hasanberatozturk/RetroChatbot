@@ -65,9 +65,9 @@
           <div class="box">
             <div class="box-title">MENÜ</div>
             <ul class="nav">
-              <li><a href="#" data-construction>Ana Sayfa</a></li>
+              <li><a href="#" data-view="chat">Ana Sayfa</a></li>
               <li><a href="#" data-construction>Hakkımda</a></li>
-              <li><a href="#" data-construction>Ziyaretçi Defteri</a> <span class="blink new">YENİ!</span></li>
+              <li><a href="#" data-view="guestbook">Ziyaretçi Defteri</a> <span class="blink new">YENİ!</span></li>
               <li><a href="#" data-construction>Favori Linklerim</a></li>
               <li><a href="#" data-construction>MIDI Arşivi</a></li>
             </ul>
@@ -94,7 +94,7 @@
         </td>
 
         <td class="main">
-          <div class="window">
+          <div class="window" id="retro-chat-view">
             <div class="titlebar">
               <span class="titlebar-text">RetroChat 1.0 - #90lar</span>
               <span class="titlebar-buttons">
@@ -115,6 +115,42 @@
               <span class="status-cell" id="clock"></span>
               <button type="button" class="status-button" id="retro-export" title="Sohbeti diskete kaydet">Kaydet...</button>
             </div>
+          </div>
+
+          <div class="guestbook" id="retro-guestbook-view" hidden>
+            <h2 class="gb-title">~ Ziyaretçi Defteri ~</h2>
+            <p class="gb-intro">
+              Sitemi ziyaret ettiğin için teşekkürler! Gitmeden önce bir iz bırak <span class="blink">:)</span>
+            </p>
+
+            <form class="gb-form" id="gb-form" autocomplete="off">
+              <table class="gb-table" cellpadding="4">
+                <tr>
+                  <td><label for="gb-name">Adın:</label></td>
+                  <td><input type="text" id="gb-name" maxlength="40" required></td>
+                </tr>
+                <tr>
+                  <td><label for="gb-city">Şehrin:</label></td>
+                  <td><input type="text" id="gb-city" maxlength="40"></td>
+                </tr>
+                <tr>
+                  <td><label for="gb-message">Mesajın:</label></td>
+                  <td><textarea id="gb-message" maxlength="500" rows="4" required></textarea></td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td>
+                    <button type="submit" id="gb-submit">Deftere Yaz!</button>
+                    <button type="reset">Temizle</button>
+                  </td>
+                </tr>
+              </table>
+              <p class="gb-feedback" id="gb-feedback" aria-live="polite"></p>
+            </form>
+
+            <hr class="gb-rule">
+            <div class="gb-entries" id="gb-entries"></div>
+            <p class="gb-back"><a href="#" data-view="chat">&lt;&lt; Sohbet odasına dön</a></p>
           </div>
         </td>
       </tr>
