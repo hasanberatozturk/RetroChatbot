@@ -52,9 +52,28 @@ yaparlar (ör. 1975'teki Kemal ile 2077'deki ZERO müzik konuşur). Her mesaj bi
 | `GEMINI_MODEL` | Önce denenen model, ör. `gemini-3.8-flash` |
 | `GEMINI_FALLBACK_MODELS` | Virgülle ayrılmış yedek modeller. Ana modelin kotası dolarsa ya da model yoğunsa sırayla bunlar denenir. |
 | `DATABASE_PATH` | SQLite dosyasının yolu (varsayılan: `data/retrochatbot.db`) |
+| `CHAT_RATE_LIMIT` | Kişi başı sohbet sınırı, `istek/saniye` biçiminde (varsayılan: `30/300`) |
 
 Ücretsiz planda kota **model başına** sayılır (ör. günde 20 istek). Bir modelin kotası dolunca
 Google'ın bildirdiği bekleme süresi boyunca o model atlanır ve sıradaki modele geçilir.
+
+## İnternete yükleme (Render)
+
+Proje [Render](https://render.com)'ın ücretsiz planına göre ayarlandı (`render.yaml`).
+
+1. Projeyi GitHub'a gönder (`.env` dosyası `.gitignore`'da olduğu için API anahtarın gitmez).
+2. Render'da **New → Blueprint** seç ve GitHub deposunu bağla. Render, `render.yaml`'ı okuyup
+   servisi kendisi kurar.
+3. Sorulduğunda `GEMINI_API_KEY` değerini gir.
+4. Kurulum bitince Render sana `https://retrochatbot-xxxx.onrender.com` gibi bir adres verir.
+
+Bilmen gerekenler:
+
+- Ücretsiz planda servis 15 dakika boyunca kimse girmezse uykuya geçer; ilk açılış 30-60 saniye sürebilir.
+- Ücretsiz planda disk kalıcı değildir: her yeniden başlatmada **ziyaretçi defteri ve sayaç sıfırlanır**.
+  Kalıcı olması için Render'ın ücretli "Persistent Disk" özelliği ya da harici bir veritabanı gerekir.
+- Siteyi açan herkes senin Gemini kotanı kullanır. Kişi başı sınır (`CHAT_RATE_LIMIT`) bunu yavaşlatır,
+  ama linki geniş kitlelerle paylaşırsan günlük ücretsiz kota hızlı biter.
 
 ## Proje yapısı
 
@@ -80,6 +99,7 @@ Yeni bir dönem eklemek için: `prompts.py`'a kişiliği, `index.html`'e bir bö
 | Endpoint | Açıklama |
 |---|---|
 | `GET /` | Arayüz |
+| `GET /healthz` | Sağlık kontrolü (Render için) |
 | `POST /api/chat` | `{ "message": "...", "history": [...], "era": "1998" }` → `{ "reply": "..." }` |
 | `POST /api/chat/stream` | Aynı istek; cevap NDJSON olarak parça parça gelir: `{"type": "chunk", "text": "..."}` ... `{"type": "done"}` |
 | `POST /api/visit` | Ziyaretçi sayacını bir artırır (kalıcı) |

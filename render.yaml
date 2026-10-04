@@ -1,0 +1,22 @@
+# Render Blueprint: GitHub deposunu Render'a bağlayınca bu ayarlarla bir web servisi kurulur.
+# Ayrıntılar README'deki "İnternete yükleme" bölümünde.
+services:
+  - type: web
+    name: retrochatbot
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    # --proxy-headers: Render'ın proxy'si arkasında gerçek ziyaretçi IP'si (istek sınırı için)
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT --proxy-headers --forwarded-allow-ips="*"
+    healthCheckPath: /healthz
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.10
+      - key: GEMINI_API_KEY
+        sync: false # Değeri Render panelinden sen gireceksin, depoya yazılmaz
+      - key: GEMINI_MODEL
+        value: gemini-3.8-flash
+      - key: GEMINI_FALLBACK_MODELS
+        value: gemini-3.7-flash,gemini-3.6-flash,gemini-3.5-flash,gemini-3.5-flash-lite,gemini-3.1-flash-lite
+      - key: CHAT_RATE_LIMIT
+        value: 30/300

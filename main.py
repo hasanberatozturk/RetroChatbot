@@ -1,5 +1,6 @@
 import json
 import math
+import os
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Literal
@@ -50,12 +51,33 @@ def to_http_error(error: Exception) -> HTTPException:
     return HTTPException(status_code=500, detail=str(error))
 
 
+def parse_rate(value: str, default: tuple[int, int]) -> tuple[int, int]:
+    """ "30/300" -> (30, 300): 300 saniyede en fazla 30 istek."""
+    try:
+        count, seconds = value.split("/")
+        return int(count), int(seconds)
+    except (AttributeError, ValueError):
+        return default
+
+
+# Sohbet: Gemini kotasını korumak için kişi başı sınır (.env ile değiştirilebilir)
+chat_limiter = RateLimiter(*parse_rate(os.getenv("CHAT_RATE_LIMIT", ""), (30, 300)))
 # Ziyaretçi defterine aynı kişi 30 saniyede en fazla 1 kez yazabilir
 guestbook_limiter = RateLimiter(max_requests=1, per_seconds=30)
 
 
 def client_ip(request: Request) -> str:
+    # Render gibi bir proxy arkasında uvicorn --proxy-headers ile gerçek IP buraya gelir
     return request.client.host if request.client else "bilinmiyor"
+
+
+def check_chat_limit(request: Request) -> None:
+    retry_after = chat_limiter.check(client_ip(request))
+    if retry_after is not None:
+        raise HTTPException(
+            status_code=429,
+            detail=f"Çok hızlı mesaj gönderiyorsun! {math.ceil(retry_after)} saniye sonra tekrar dene.",
+        )
 
 
 @asynccontextmanager
@@ -106,6 +128,11 @@ async def index():
     return FileResponse(STATIC_DIR / "index.html")
 
 
+@app.get("/healthz")
+async def healthz():
+    return {"status": "ok"}
+
+
 @app.post("/api/visit")
 def visit():
     return {"count": database.increment_counter("visitors")}
@@ -128,7 +155,8 @@ def guestbook_add(entry: GuestbookEntryIn, request: Request):
 
 
 @app.post("/api/chat", response_model=ChatResponse)
-async def chat(req: ChatRequest):
+async def chat(req: ChatRequest, request: Request):
+    check_chat_limit(request)
     try:
         reply = await ask_gemini(req.message, req.trimmed_history(), req.era)
     except (AllModelsBusyError, RuntimeError, genai_errors.APIError) as e:
@@ -142,10 +170,11 @@ def ndjson(event: dict) -> str:
 
 
 @app.post("/api/chat/stream")
-async def chat_stream(req: ChatRequest):
+async def chat_stream(req: ChatRequest, request: Request):
     """Cevabı satır satır JSON olayları (NDJSON) halinde akıtır:
     {"type": "chunk", "text": "..."} ... {"type": "done"}
     Akış ortasında hata olursa: {"type": "error", "message": "..."}"""
+    check_chat_limit(request)
     try:
         chunks = await stream_gemini(req.message, req.trimmed_history(), req.era)
     except (AllModelsBusyError, RuntimeError, genai_errors.APIError) as e:
