@@ -17,6 +17,13 @@ body {
   display: contents;
 }
 
+/* Dar ekranda buluşma butonunda sadece simge kalsın */
+@media (max-width: 600px) {
+  .tm-meet-label {
+    display: none;
+  }
+}
+
 /* ---------- Zaman yolculuğu geçişi ---------- */
 
 .warp {

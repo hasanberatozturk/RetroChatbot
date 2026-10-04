@@ -96,6 +96,7 @@ document.getElementById("seventies-export").addEventListener("click", () => {
 
 export default {
   id: "1975",
+  botName: "Kemal",
   title: "Kemal'in Plak Dükkânı · 1975",
   warpText: "1975'e ışınlanılıyor...",
   site,

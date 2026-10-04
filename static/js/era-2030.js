@@ -211,6 +211,7 @@ if (SpeechRecognition) {
 
 export default {
   id: "2030",
+  botName: "Nova",
   title: "Nova · 2030",
   warpText: "2030'a ışınlanılıyor...",
   site,

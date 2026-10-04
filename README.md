@@ -14,6 +14,9 @@ geçiş yaparsın; her dönemin hem kişiliği hem de arayüzü o yıla göre ta
 Cevaplar akışla gelir ve her dönemin hızında harf harf yazılır. Sohbetler tarayıcıda
 saklanır ve her dönemden dosya olarak indirilebilir.
 
+**⚡ Zaman Buluşması:** iki dönemin botunu seçersin, birbirleriyle 6 mesajlık bir sohbet
+yaparlar (ör. 1975'teki Kemal ile 2077'deki ZERO müzik konuşur). Her mesaj bir Gemini isteği kullanır.
+
 - **Backend:** Python, FastAPI
 - **Yapay zeka:** Google Gemini API (`google-genai`)
 - **Frontend:** Saf HTML, CSS ve JavaScript (framework yok)

@@ -95,6 +95,7 @@ document.getElementById("cyber-export").addEventListener("click", () => {
 
 export default {
   id: "2077",
+  botName: "ZERO",
   title: "NEO//İSTANBUL · 2077",
   warpText: "2077'ye ışınlanılıyor...",
   site,

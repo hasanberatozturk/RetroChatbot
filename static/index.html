@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="/static/css/era-2005.css">
   <link rel="stylesheet" href="/static/css/era-2030.css">
   <link rel="stylesheet" href="/static/css/era-2077.css">
+  <link rel="stylesheet" href="/static/css/meeting.css">
 </head>
 <body class="era-1998">
 
@@ -270,6 +271,31 @@
       <button type="button" class="c-action" id="cyber-clear">[ BELLEĞİ SİL ]</button>
     </footer>
   </div>
+
+  <!-- Zaman buluşması: iki dönemin botu birbiriyle konuşur -->
+  <dialog class="meet" id="meet-dialog" aria-labelledby="meet-title">
+    <header class="meet-header">
+      <h2 id="meet-title">⚡ Zaman Buluşması</h2>
+      <button type="button" class="meet-close" id="meet-close" aria-label="Kapat">×</button>
+    </header>
+    <p class="meet-intro">İki farklı dönemin botunu seç, birbirleriyle sohbet etsinler.</p>
+
+    <form class="meet-setup" id="meet-form">
+      <label class="meet-field">1. bot <select id="meet-a"></select></label>
+      <span class="meet-vs" aria-hidden="true">⇄</span>
+      <label class="meet-field">2. bot <select id="meet-b"></select></label>
+      <label class="meet-field meet-topic">Konu (isteğe bağlı)
+        <input type="text" id="meet-topic" maxlength="200" placeholder="ör. müzik, telefonlar, okul hayatı">
+      </label>
+      <div class="meet-buttons">
+        <button type="submit" class="meet-primary" id="meet-start">Buluşmayı başlat</button>
+        <button type="button" class="meet-secondary" id="meet-stop" hidden>Durdur</button>
+      </div>
+    </form>
+    <p class="meet-quota">Bir buluşma 6 mesajdan oluşur ve Gemini kotandan 6 istek kullanır.</p>
+
+    <div class="meet-log" id="meet-log" aria-live="polite"></div>
+  </dialog>
 
   <!-- Zaman yolculuğu geçiş efekti -->
   <div class="warp" id="warp" hidden>

@@ -144,6 +144,7 @@ document.getElementById("noughties-export").addEventListener("click", () => {
 
 export default {
   id: "2005",
+  botName: "Ece",
   title: "~*~EcE~*~ ♥ ile Konuşma",
   warpText: "2005'e ışınlanılıyor...",
   site,

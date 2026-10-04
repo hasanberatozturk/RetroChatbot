@@ -61,7 +61,7 @@ export function downloadText(filename, text, type) {
 }
 
 // Sunucudan gelen NDJSON akışını satır satır olaylara çevirir
-async function* readEvents(response) {
+export async function* readEvents(response) {
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
   let buffer = "";
@@ -79,7 +79,7 @@ async function* readEvents(response) {
 }
 
 // Gelen metni harf harf ekrana yazar. Hız ayarları her dönemde farklı.
-function createTyper(textNode, onUpdate, options = {}) {
+export function createTyper(textNode, onUpdate, options = {}) {
   const { minChars = 2, maxChars = 2, tickMs = 16, stallChance = 0, stallMs = 0, onChar } = options;
   let queue = "";
   let ended = false;

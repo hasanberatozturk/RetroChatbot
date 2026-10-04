@@ -133,6 +133,7 @@ loadVisitorCounter();
 
 export default {
   id: "1998",
+  botName: "RetroBot",
   title: "RetroBot'un Sohbet Odası",
   warpText: "1998'e ışınlanılıyor...",
   site,

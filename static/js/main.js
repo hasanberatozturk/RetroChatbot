@@ -5,6 +5,7 @@ import era1998 from "./era-1998.js";
 import era2005 from "./era-2005.js";
 import era2030 from "./era-2030.js";
 import era2077 from "./era-2077.js";
+import { openMeeting, setupMeeting } from "./meeting.js";
 
 const ERAS = [era1975, era1998, era2005, era2030, era2077];
 const DEFAULT_ERA = "1998";
@@ -44,13 +45,22 @@ function buildTimeMachines() {
       years.appendChild(button);
     }
 
+    const meet = document.createElement("button");
+    meet.type = "button";
+    meet.className = "tm-year tm-meet";
+    meet.innerHTML = '⚡<span class="tm-meet-label"> Buluşma</span>';
+    meet.title = "Zaman buluşması: iki dönemin botunu birbiriyle konuştur";
+    meet.setAttribute("aria-label", "Zaman buluşması");
+    meet.addEventListener("click", () => openMeeting(currentEra.id));
+    years.appendChild(meet);
+
     group.append(label, years);
     slot.replaceChildren(group);
   });
 }
 
 function markCurrentYear(id) {
-  document.querySelectorAll(".tm-year").forEach((button) => {
+  document.querySelectorAll(".tm-year[data-era]").forEach((button) => {
     const isCurrent = button.dataset.era === id;
     button.setAttribute("aria-current", String(isCurrent));
     button.disabled = isCurrent;
@@ -101,6 +111,7 @@ document.getElementById("modernize-btn").addEventListener("click", () => switchE
 /* ---------- Başlangıç ---------- */
 
 buildTimeMachines();
+setupMeeting(ERAS);
 for (const era of ERAS) era.chat.restore();
 
 // Saat göstergeleri: bugünün gün/ay/saati, yıl ise her dönemin kendi yılı
