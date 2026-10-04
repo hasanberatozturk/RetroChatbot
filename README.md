@@ -42,7 +42,7 @@ yaparlar (ör. 1975'teki Kemal ile 2077'deki ZERO müzik konuşur). Her mesaj bi
    .venv\Scripts\python.exe -m uvicorn main:app --reload
    ```
 
-4. Tarayıcıda <http://localhost:8000> adresini aç.
+4. Tarayıcıda <https://retrochatbot.onrender.com/> adresini aç.
 
 ## Ayarlar (`.env`)
 
