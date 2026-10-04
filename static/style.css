@@ -232,6 +232,10 @@ body.retro {
   cursor: default;
 }
 
+#retro-clear {
+  cursor: pointer;
+}
+
 #retro-site button {
   color: #000000;
   font-family: inherit;

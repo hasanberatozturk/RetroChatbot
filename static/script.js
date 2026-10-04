@@ -8,6 +8,37 @@ function pad(n) {
 }
 
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const MAX_SAVED_MESSAGES = 100; // Tarayıcıda dönem başına saklanan en fazla mesaj
+
+function currentTime() {
+  const now = new Date();
+  return `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+}
+
+function loadPreference(key) {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function savePreference(key, value) {
+  try {
+    localStorage.setItem(key, value);
+  } catch {
+    // Tarayıcı depolamayı engelliyorsa tercih sadece bu oturumda geçerli olur
+  }
+}
+
+function loadSavedChat(era) {
+  try {
+    const saved = JSON.parse(loadPreference(`chat-${era}`) || "[]");
+    return Array.isArray(saved) ? saved.filter((m) => m && typeof m.text === "string") : [];
+  } catch {
+    return [];
+  }
+}
 
 /* ===================== Ortak sohbet mantığı ===================== */
 
@@ -73,8 +104,15 @@ function createTyper(textNode, onUpdate, options = {}) {
 }
 
 // Her dönemin kendi geçmişi var; 1998 botu 2030 konuşmasını görmez (ve tersi).
+// Geçmiş tarayıcıda saklanır, sayfa yenilenince geri yüklenir.
+// Mesaj biçimi: { role: "user" | "model", text, time: "HH:MM" }
 function createChat({ era, formEl, inputEl, ui }) {
-  const history = [];
+  const history = loadSavedChat(era);
+
+  function persist() {
+    history.splice(0, Math.max(0, history.length - MAX_SAVED_MESSAGES));
+    savePreference(`chat-${era}`, JSON.stringify(history));
+  }
 
   async function send(text) {
     ui.onSend?.();
@@ -98,7 +136,11 @@ function createChat({ era, formEl, inputEl, ui }) {
       const res = await fetch("/api/chat/stream", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text, history, era }),
+        body: JSON.stringify({
+          message: text,
+          history: history.map(({ role, text }) => ({ role, text })),
+          era,
+        }),
       });
 
       if (!res.ok) {
@@ -134,7 +176,9 @@ function createChat({ era, formEl, inputEl, ui }) {
         ui.addError(ui.networkErrorText);
         return;
       }
-      history.push({ role: "user", text }, { role: "model", text: reply });
+      const time = currentTime();
+      history.push({ role: "user", text, time }, { role: "model", text: reply, time });
+      persist();
       ui.onReply?.(reply);
     } catch {
       removeLoading();
@@ -153,7 +197,20 @@ function createChat({ era, formEl, inputEl, ui }) {
     send(text);
   });
 
-  return { send, focus: () => inputEl.focus({ preventScroll: true }) };
+  // Kayıtlı sohbeti ekrana çizer (sayfa açılışında)
+  function restore() {
+    ui.reset();
+    if (history.length) ui.onRestore?.();
+    for (const message of history) ui.renderSaved(message);
+  }
+
+  function clear() {
+    history.length = 0;
+    persist();
+    ui.reset();
+  }
+
+  return { send, restore, clear, focus: () => inputEl.focus({ preventScroll: true }) };
 }
 
 /* ===================== 1998 arayüzü ===================== */
@@ -169,20 +226,19 @@ function retroScroll() {
   retroMessagesEl.scrollTop = retroMessagesEl.scrollHeight;
 }
 
-function addChatLine(nick, text, nickClass) {
-  const now = new Date();
+function addChatLine(nick, text, nickClass, time = currentTime()) {
   const line = document.createElement("p");
   line.className = "line";
 
-  const time = document.createElement("span");
-  time.className = "time";
-  time.textContent = `[${pad(now.getHours())}:${pad(now.getMinutes())}] `;
+  const timeEl = document.createElement("span");
+  timeEl.className = "time";
+  timeEl.textContent = `[${time}] `;
 
   const nickEl = document.createElement("span");
   nickEl.className = nickClass;
   nickEl.textContent = `<${nick}> `;
 
-  line.append(time, nickEl, document.createTextNode(text));
+  line.append(timeEl, nickEl, document.createTextNode(text));
   retroMessagesEl.appendChild(line);
   retroScroll();
   return line;
@@ -205,6 +261,12 @@ const retroChat = createChat({
     networkErrorText: "Bağlantı koptu! Biri telefonu mu kaldırdı?",
     addUser: (text) => addChatLine("Sen", text, "nick-user"),
     addError: (text) => addSystemLine(`HATA: ${text}`, "error"),
+    renderSaved({ role, text, time }) {
+      if (role === "user") addChatLine("Sen", text, "nick-user", time);
+      else addChatLine("RetroBot", text, "nick-bot", time);
+    },
+    onRestore: () => addSystemLine("Önceki sohbet disketten yüklendi."),
+    reset: retroGreeting,
     startBot() {
       const element = addChatLine("RetroBot", "", "nick-bot");
       return { element, textNode: element.lastChild };
@@ -240,6 +302,22 @@ async function loadVisitorCounter() {
     counterEl.textContent = "??????";
   }
 }
+
+function retroGreeting() {
+  retroMessagesEl.replaceChildren();
+  addSystemLine("#90lar kanalına katıldın.");
+  addSystemLine("RetroBot kanala katıldı.");
+  addChatLine(
+    "RetroBot",
+    "Selaaam! Hoş geldin dostum :) Ben RetroBot, internet kafenin gece vardiyasındayım. Ne sormak istersin?",
+    "nick-bot"
+  );
+}
+
+document.getElementById("retro-clear").addEventListener("click", () => {
+  if (retroInputEl.disabled) return;
+  if (confirm("Sohbet geçmişi silinsin mi? Bu işlem geri alınamaz!")) retroChat.clear();
+});
 
 /* ===================== 2030 arayüzü ===================== */
 
@@ -277,6 +355,11 @@ const futureChat = createChat({
       addBubble(text, "user");
     },
     addError: (text) => addBubble(text, "error"),
+    renderSaved({ role, text }) {
+      futureSuggestionsEl.hidden = true;
+      addBubble(text, role === "user" ? "user" : "bot");
+    },
+    reset: futureGreeting,
     startBot() {
       const element = addBubble("", "bot");
       const textNode = document.createTextNode("");
@@ -309,6 +392,20 @@ const futureChat = createChat({
   },
 });
 
+function futureGreeting() {
+  futureMessagesEl.replaceChildren();
+  futureSuggestionsEl.hidden = false;
+  addBubble("Merhaba, ben Nova 👋 2030'dan selamlar! Bugün senin için ne yapabilirim?", "bot");
+}
+
+document.getElementById("future-clear").addEventListener("click", () => {
+  if (futureInputEl.disabled) return;
+  if (confirm("Yeni bir sohbet başlatılsın mı? Mevcut konuşma silinecek.")) {
+    stopSpeaking();
+    futureChat.clear();
+  }
+});
+
 futureSuggestionsEl.querySelectorAll(".f-chip").forEach((chip) => {
   chip.addEventListener("click", () => {
     if (!futureInputEl.disabled) futureChat.send(chip.textContent);
@@ -324,22 +421,6 @@ const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecogni
 const canSpeak = "speechSynthesis" in window;
 let speakEnabled = false;
 let recognition = null;
-
-function loadPreference(key) {
-  try {
-    return localStorage.getItem(key);
-  } catch {
-    return null;
-  }
-}
-
-function savePreference(key, value) {
-  try {
-    localStorage.setItem(key, value);
-  } catch {
-    // Tarayıcı depolamayı engelliyorsa tercih sadece bu oturumda geçerli olur
-  }
-}
 
 function speak(text) {
   if (!speakEnabled || !canSpeak) return;
@@ -486,14 +567,7 @@ updateClocks();
 setInterval(updateClocks, 30 * 1000);
 loadVisitorCounter();
 
-addSystemLine("#90lar kanalına katıldın.");
-addSystemLine("RetroBot kanala katıldı.");
-addChatLine(
-  "RetroBot",
-  "Selaaam! Hoş geldin dostum :) Ben RetroBot, internet kafenin gece vardiyasındayım. Ne sormak istersin?",
-  "nick-bot"
-);
-
-addBubble("Merhaba, ben Nova 👋 2030'dan selamlar! Bugün senin için ne yapabilirim?", "bot");
+retroChat.restore();
+futureChat.restore();
 
 retroChat.focus();
