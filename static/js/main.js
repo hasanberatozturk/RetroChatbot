@@ -123,8 +123,6 @@ function switchEra(id) {
   }, 1400);
 }
 
-document.getElementById("modernize-btn").addEventListener("click", () => switchEra("2030"));
-
 /* ---------- Başlangıç ---------- */
 
 buildTimeMachines();

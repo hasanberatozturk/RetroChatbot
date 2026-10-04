@@ -40,31 +40,13 @@ body.era-1998 {
   font-size: 12px;
 }
 
-/* ---------- Zaman makinesi butonu ---------- */
+/* ---------- Zaman makinesi çubuğu ---------- */
 
 .top-bar {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: flex-start;
-  justify-content: space-between;
+  justify-content: center;
   max-width: 960px;
   margin: 0 auto 4px;
-}
-
-#retro-site .modernize-btn {
-  padding: 6px 14px;
-  color: #ff0000;
-  font-family: "Comic Sans MS", "Comic Sans", cursive;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-#retro-site .modernize-btn small {
-  color: #000080;
-  font-size: 11px;
-  font-weight: normal;
 }
 
 /* ---------- Başlık ---------- */
